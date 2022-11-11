@@ -10,7 +10,7 @@ app.use(cors());
 
 const posts = require('./routes/api/posts');
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8000;
 
-app.listen(port, () => console.log('Server started on port 8080'));
+app.listen(port, () => console.log('Server started on port 8000'));
 
