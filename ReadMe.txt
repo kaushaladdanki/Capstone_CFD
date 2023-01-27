@@ -2,7 +2,7 @@ How this was created.
 
 npm init
 
-dependancies: npm i express cors body-parser monmgodb (if not using mongo we will add other dependancy later)
+dependancies: npm i express cors body-parser monmgodb
 
 dev dependancy: npm i -D nodemon
 
@@ -12,7 +12,7 @@ dev: nodemon server/index.js
 
 Added server folder w/ index.js file
 
-Can run npm run dev in for nodemon to host local server on port 8000
+note: index.js need to have the port number not hardcoded, but using ${port} did not act as a variable for the prot 8080
 
-To host client and look at frontend: npm run dev in the terminal while in the client folder.  This will host to port 8080
+After this can run npm run dev for nodemon to host local server on port 8080
 
