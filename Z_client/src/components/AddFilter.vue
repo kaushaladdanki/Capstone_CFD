@@ -7,6 +7,7 @@
             <h2>Add Filter</h2>
         </div>
         <p>Zoe was here</p> 
+        <p>So was Charlie</p> 
         <form>
             <label>Feature:</label>
             <input type="text" required v-model="temp1" >
@@ -45,7 +46,7 @@ export default class AddFilter extends Vue {
 </script>
 <style scoped lang="less">
 @purp: #222249;
-@tan: #b8762a;
+@tan: #12f7f0;
 @paleblue: #a1a9de;
 @brown: #a96149;
 .modal-overlay {
