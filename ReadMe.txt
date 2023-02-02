@@ -2,9 +2,9 @@ How this was created.
 
 npm init
 
-dependancies: npm i express cors body-parser monmgodb
+dependencies: npm i express cors body-parser monmgodb
 
-dev dependancy: npm i -D nodemon
+dev dependency: npm i -D nodemon
 
 altered scripts in package.json, made scripts for:
 start: node server/index.js
