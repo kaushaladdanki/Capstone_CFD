@@ -5,14 +5,21 @@
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <div class="modal-header">
             <h2>Generate Sample</h2>
+            <SampleForm />
         </div> 
       </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component';
+import { Options, Vue } from 'vue-class-component';
+import SampleForm from './SampleForm.vue';
 
+@Options({
+  components: {
+    SampleForm
+  }
+})
 export default class Sample extends Vue {
     closeThis(){
         this.$emit("closeModalSample");
