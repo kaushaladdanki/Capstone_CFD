@@ -2,7 +2,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+const path = __dirname + '/app/views/';
 const app = express();
+
+app.use(express.static(path));
 
 var corsOptions = {
   origin: "http://localhost:8081"
@@ -16,7 +19,7 @@ const db = require("./app/models");
 db.sequelize.sync();
 
 app.get("/", (req, res) => {
-  res.json({ message: "Test '/' GET" });
+  res.sendFile(path + 'index.html');
 });
 
 const PORT = process.env.PORT || 8080;
