@@ -4,17 +4,33 @@
       <div class="modal">
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <div class="modal-header">
-            <h2>Generate Sample</h2>
-        </div> 
+          <h2>Generate Sample</h2>
+          <form>
+            <label for="sample-size-picker">Sample Size: </label>
+            <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+            <button class="submit" :disabled="!validSampleSize" @click.prevent="genSample()">Submit</button>
+            <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+          </form>
+        </div>
       </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component';
+import { Options, Vue } from 'vue-class-component';
 
 export default class Sample extends Vue {
-    closeThis(){
+  sampleSize = 20;
+
+  get validSampleSize() {
+      return this.sampleSize > 0;
+  }
+  genSample(){
+      this.$emit("genSample");
+      this.closeThis();
+  }  
+  
+  closeThis(){
         this.$emit("closeModalSample");
     }
 
@@ -72,5 +88,8 @@ export default class Sample extends Vue {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+#sample-size-error-message {
+    color: red;
 }
 </style>
