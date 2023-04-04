@@ -124,18 +124,31 @@ export default class BaseComp extends Vue {
   }
 
   // pass in a filter object instead of just the string
+  // This will add the filter to the list and remove the feature from the features list.
+  // apply filter to the database and dsiplay current # of faces present in database with filters applied.
   addNewFilter(info:string){
     this.filterList.push(info)
   }
 
-  genSamp(s: number){
-    
-    this.displaySample = !this.displaySample;
-  }
-
+  // Remove filter from list
+  // add feature name back to features list for filter form
+  // probably easiest way to update database is to just redo adding filters to the complete database each time
   removeFilter(f: string){
     var index = this.filterList.indexOf(f)-1;
     this.filterList = this.filterList.splice(index, 1);
+  }
+
+  // called after each add or remove filter
+  // This takes the entire database and applies each filter in the queue
+  // after each filter is applied, the total number of faces in database to be displayed is updated.
+  // the filtered faces array is also updated, that is the one passed to the sample generation feature
+  //updateFilter(){
+
+  //}
+
+  genSamp(s: number){
+    
+    this.displaySample = !this.displaySample;
   }
 
   testCSV = `Target,Race,Gender,Age,NumberofRaters,Female_prop,Male_prop,Asian_prop,Black_prop,Latino_prop,Multi_prop,Other_prop,White_prop,Afraid,Angry,Attractive,Babyface,Disgusted,Dominant,Feminine,Happy,Masculine,Prototypic,Sad,Suitability,Surprised,Threatening,Trustworthy,Unusual,Luminance_median,Nose_Width,Nose_Length,Lip_Thickness,Face_Length,R_Eye_H,L_Eye_H,Avg_Eye_Height,R_Eye_W,L_Eye_W,Avg_Eye_Width,Face_Width_Cheeks,Face_Width_Mouth,Forehead,Pupil_Top_R,Pupil_Top_L,Asymmetry_pupil_top,Pupil_Lip_R,Pupil_Lip_L,Asymmetry_pupil_lip,BottomLip_Chin,Midcheek_Chin_R,Midcheek_Chin_L,Cheeks_avg,Midbrow_Hairline_R,Midbrow_Hairline_L,Faceshape,Heartshapeness,Noseshape,LipFullness,EyeShape,EyeSize,UpperHeadLength,MidfaceLength,ChinLength,ForeheadHeight,CheekboneHeight,CheekboneProminence,FaceRoundness,fWHR

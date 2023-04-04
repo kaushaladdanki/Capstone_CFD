@@ -181,6 +181,13 @@ min = 0
 max = 1
 invalidRange = false;
 types = ["Race","Gender","Age","Race Prop","Attributes","Face Measurements"]
+filterObject = {
+  feature: "Race",
+  category: 'r',
+  max: -1,
+  min: -1,
+  exclude: ["White, Latino, Other"]
+}
 
 selectFeat(t: string){
   var info = ""
