@@ -15,6 +15,7 @@
       </select>
       <br />
       
+      <!-- could potentially base string bassed to feat off of string used in a v-for from a list displayed with {{ like above }}-->
       <div v-if="temp0==='Race'" >
         <br />
         <br />
@@ -48,7 +49,7 @@
         <button type="button" @click.prevent="selectFeat('Female')">Female</button>
       </div>
 
-      <div v-if="temp0==='Age'" >
+      <div v-if="temp0==='Age'">
         <br />
         <br />
         Range for selected feature must be between {{ min }} and {{ max }}
@@ -56,7 +57,7 @@
         <br />
         <div>
           Select Minimum Value of Range
-          <input type="number" v-model="temp2"  />
+          <input type="number" v-model="temp2"/>
         </div>
         <br />
         <div>
@@ -71,7 +72,7 @@
       </div>
 
       <div v-if="temp0==='Race Prop'" >
-        Select a Feature?:
+        Select a prop:
         <select v-model="temp1">
           <option disabled value="">Select Feature</option>
           <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
@@ -91,7 +92,7 @@
           <input type="number" v-model="temp3" />
         </div>
         <div class="modal-header">
-            <h2>{{ info }}</h2>
+            <h2>{{info }}</h2>
             <h2>{{ i2 }}</h2>
         </div>
         <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
@@ -99,7 +100,7 @@
 
       <div v-if="temp0==='Attributes'" >
         Select a Feature:
-        <select v-model="temp1">
+        <select v-model="temp1" required>
           <option disabled value="">Select Feature</option>
           <option v-for="i in feats.slice(13,29)" :key="i" :value="i" >{{ i }}</option>
         </select>
@@ -126,7 +127,7 @@
 
       <div v-if="temp0==='Face Measurements'" >
         Select a Feature:
-        <select v-model="temp1">
+        <select v-model="temp1" required>
           <option disabled value="">Select Feature</option>
           <option v-for="i in feats.slice(56,68)" :key="i" :value="i" >{{ i }}</option>
         </select>
@@ -175,54 +176,87 @@ temp0 = ""
 temp1 = "_____"
 temp2 = 0
 temp3 = 1
-info = ""
 i2 = ""
 min = 0
 max = 1
 invalidRange = false;
 types = ["Race","Gender","Age","Race Prop","Attributes","Face Measurements"]
+info = ""
 filterObject = {
   feature: "Race",
   category: 'r',
   max: -1,
   min: -1,
-  exclude: ["White, Latino, Other"]
+  exclude: "White",
+  info: ""
 }
 
 selectFeat(t: string){
-  var info = ""
   switch (t) {
     default:
       this.closeThis();
       break;
     case "Male":
-      info = "Male faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "Male faces will be removed"
+      this.filterObject.feature = "Gender";
+      this.filterObject.category = "g";
+      this.filterObject.exclude = "Male";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
     case "Female":
-      info = "Feale faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "Female faces will be removed"
+      this.filterObject.feature = "Gender";
+      this.filterObject.category = "g";
+      this.filterObject.exclude = "Female";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
     case "White":
-      info = "White faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "White faces will be removed"
+      this.filterObject.feature = "White";
+      this.filterObject.category = "r";
+      this.filterObject.exclude = "White";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
     case "Other":
-      info = "Race: Other faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "Race: Other faces will be removed"
+      this.filterObject.feature = "Other";
+      this.filterObject.category = "r";
+      this.filterObject.exclude = "Other";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
     case "Asian":
-      info = "Asian faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "Asian faces will be removed"
+      this.filterObject.feature = "Asian";
+      this.filterObject.category = "r";
+      this.filterObject.exclude = "Asian";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
     case "Latino":
-      info = "Latino faces will be removed"
-      this.$emit("createNewFilter", info);
+      this.filterObject.info = "Latino faces will be removed"
+      this.filterObject.feature = "Latino";
+      this.filterObject.category = "r";
+      this.filterObject.exclude = "Latino";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
+      this.closeThis();
+      break;
+    case "Black":
+      this.filterObject.info = "Black faces will be removed"
+      this.filterObject.feature = "Black";
+      this.filterObject.category = "r";
+      this.filterObject.exclude = "Black";
+      this.$emit("update:filterObject", this.filterObject);
+      this.$emit("createNewFilter");
       this.closeThis();
       break;
   }
@@ -261,8 +295,10 @@ createFilter(){
     this.closeThis();
   }
   else{
-    var info: string = this.temp1 + " is between " + this.temp2 + " and " + this.temp3;
-    this.$emit("createNewFilter", info);
+    this.filterObject.feature = this.temp1;
+    this.filterObject.info = this.info;
+    this.$emit("update:filterObject", this.filterObject);
+    this.$emit("createNewFilter");
     this.closeThis();
   }
 }
@@ -285,6 +321,10 @@ checkValidity(){
   else{
     this.invalidRange = false;
     this.i2 = "";
+  }
+  if (this.temp1 === "_____"){
+    this.invalidRange = true;
+    this.i2 = "You must select a feature to create a filter."
   }
   this.info = this.temp1 + " is between " + this.temp2 + " and " + this.temp3;
 }

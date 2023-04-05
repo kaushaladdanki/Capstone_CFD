@@ -9,15 +9,15 @@
     <br />
     <!-- Handle filter modal -->
     <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
-    :feats="feats" :faces="faces"/>
+    :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
     <button @click="toggleModalFilter()" >Add Filter</button>
     <br />
     <!-- Display of current filters -->
     Current Filter:
-    <div class="filter" v-for="f in filterList" :key="f">
+    <div class="filter" v-for="f in bigList" :key="f.info">
       <p class="filter-text">
-        {{f}}
-        <button v-if="f != ''" class="close-button" type="button" @click.prevent="removeFilter(f)">X</button>
+        {{f.info}}
+        <button v-if="f.info != ''" class="close-button" type="button" @click.prevent="removeFilter(f)">X</button>
       </p> 
     </div>
     <br />
@@ -28,6 +28,13 @@
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
     <!-- <button @click="genSamp()">Clear Sample</button> -->
+    BigFO: {{ bigFO }}
+    <br />
+    <br />
+    bigList: {{ bigList }}
+    <br />
+    <br />
+    feats: {{ feats }}
     <br />
     <!-- Table for demo display. -->
     <table>
@@ -79,6 +86,7 @@ import Sample from './Sample.vue';
     AddFilter, MachineLearning, Sample
   }
 })
+
 export default class BaseComp extends Vue {
   showModalFilter = false
   showModalML = false
@@ -89,6 +97,16 @@ export default class BaseComp extends Vue {
   faces = [[""]];
   samp = ["WM-134","WM-112","WM-36","WM-201","WM-67","WM-43","WM-192","WM-177","WM-224", "WM-208", "WM-29", "WM-113", "WM-91", "WM-169"]
   headerIndex: [number] = [0];
+  bigFO = {
+  feature: "Racer",
+  category: 'rr',
+  max: -11,
+  min: -11,
+  exclude: "Whitey",
+  info: ""
+  }
+  bigList = [this.bigFO]
+  usedFeats = [""]
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
@@ -123,27 +141,50 @@ export default class BaseComp extends Vue {
     this.showModalSample = !this.showModalSample
   }
 
-  // pass in a filter object instead of just the string
   // This will add the filter to the list and remove the feature from the features list.
   // apply filter to the database and dsiplay current # of faces present in database with filters applied.
-  addNewFilter(info:string){
-    this.filterList.push(info)
+  addNewFilter(){
+    var temp = [""]
+    if(!this.usedFeats.includes(this.bigFO.feature)){
+      this.usedFeats.push(this.bigFO.feature);
+      this.bigList.push(this.bigFO);
+    }
+    else{
+      //display message saying that user can only select one filter for each feature. remove old feature before adding new.
+    }
+    //var feature = this.bigFO.feature;  .includes()
+
+    //this.feats = this.feats.filter(function(e) { return e !== feature});
+    //this.updateFilter()
   }
 
   // Remove filter from list
   // add feature name back to features list for filter form
   // probably easiest way to update database is to just redo adding filters to the complete database each time
-  removeFilter(f: string){
-    var index = this.filterList.indexOf(f)-1;
-    this.filterList = this.filterList.splice(index, 1);
+  removeFilter(f:{feature:string, category:string, max:number, min:number, exclude:string, info:string}){
+    for(var i in this.bigList){
+      if(this.bigList[i].info===f.info){
+        this.bigList.splice(this.bigList.indexOf(this.bigList[i]),1);
+        break;
+      }
+    }
+    for(var j in this.usedFeats){
+      if(this.usedFeats[j]===f.feature){
+        this.usedFeats.splice(this.usedFeats.indexOf(this.usedFeats[j]),1);
+        break;
+      }
+    }
+    //var index = this.bigList.indexOf(f)-1;
+    //this.bigList = this.bigList.filter(isObj(f));
   }
+
 
   // called after each add or remove filter
   // This takes the entire database and applies each filter in the queue
   // after each filter is applied, the total number of faces in database to be displayed is updated.
   // the filtered faces array is also updated, that is the one passed to the sample generation feature
   //updateFilter(){
-
+  //  this.bigFO.
   //}
 
   genSamp(s: number){
