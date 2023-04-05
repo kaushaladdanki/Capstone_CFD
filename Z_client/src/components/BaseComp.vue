@@ -7,6 +7,9 @@
     <button class="submit" @click="readCSV" >DemoDisplay</button>
     <br />
     <br />
+    DBsize = {{ dbSize }}
+    <br />
+    <br />
     <!-- Handle filter modal -->
     <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
     :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
@@ -34,7 +37,13 @@
     bigList: {{ bigList }}
     <br />
     <br />
-    feats: {{ feats }}
+    dbFaces: {{ dbFaces }}
+    <br />
+    <br />
+    test: {{ test }}
+    <br />
+    <br />
+    testA: {{ testA }}
     <br />
     <!-- Table for demo display. -->
     <table>
@@ -95,6 +104,7 @@ export default class BaseComp extends Vue {
   filterList = [""]
   feats = [""];
   faces = [[""]];
+  dbFaces = [[""]];
   samp = ["WM-134","WM-112","WM-36","WM-201","WM-67","WM-43","WM-192","WM-177","WM-224", "WM-208", "WM-29", "WM-113", "WM-91", "WM-169"]
   headerIndex: [number] = [0];
   bigFO = {
@@ -107,6 +117,9 @@ export default class BaseComp extends Vue {
   }
   bigList = [this.bigFO]
   usedFeats = [""]
+  dbSize = 0
+  test = "default"
+  testA = ["default"]
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
@@ -126,10 +139,12 @@ export default class BaseComp extends Vue {
       }
       // this.myArray = arrObj.slice(1);
       this.feats = headers;
+      this.dbSize = this.faces.length;
+      this.dbFaces = this.faces;
+      this.dbFaces.shift();
   }
 
   toggleModalFilter() {
-    // checkFilters() function that will view existing filters and remove existing features from being listed.
     this.showModalFilter = !this.showModalFilter
   }
 
@@ -152,10 +167,7 @@ export default class BaseComp extends Vue {
     else{
       //display message saying that user can only select one filter for each feature. remove old feature before adding new.
     }
-    //var feature = this.bigFO.feature;  .includes()
-
-    //this.feats = this.feats.filter(function(e) { return e !== feature});
-    //this.updateFilter()
+    this.updateFilter();
   }
 
   // Remove filter from list
@@ -174,6 +186,7 @@ export default class BaseComp extends Vue {
         break;
       }
     }
+    this.updateFilter();
     //var index = this.bigList.indexOf(f)-1;
     //this.bigList = this.bigList.filter(isObj(f));
   }
@@ -183,9 +196,46 @@ export default class BaseComp extends Vue {
   // This takes the entire database and applies each filter in the queue
   // after each filter is applied, the total number of faces in database to be displayed is updated.
   // the filtered faces array is also updated, that is the one passed to the sample generation feature
-  //updateFilter(){
-  //  this.bigFO.
-  //}
+  updateFilter(){
+    this.dbFaces = this.faces;
+    // read through each filter in bigList
+    for(var i in this.bigList){
+      switch (this.bigList[i].category){
+        case "g":
+          var tempFaces = [[""]]
+          var tempFeat = this.bigList[i].exclude;
+          for(var j in this.dbFaces){
+            if(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)] !== this.bigList[i].exclude){
+              tempFaces.push(this.dbFaces[j])
+              this.testA.push(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)])
+            }
+          }
+          tempFaces.shift();
+          this.dbFaces = tempFaces;
+          this.test = tempFeat;
+          break;
+        case "r":
+            
+          break;
+        case "a":
+          
+          break;
+      }
+    }
+
+    // handle filter based on category
+    // for race and gender, remove all faces with the exclusionary feature 
+    
+    // for numerical categories, remove faces with improper elemental values
+    /* This but use recursion?
+    for(var j in this.usedFeats){
+      if(this.usedFeats[j]===f.feature){
+        this.usedFeats.splice(this.usedFeats.indexOf(this.usedFeats[j]),1);
+      }
+    } 
+    */
+    this.dbSize = this.dbFaces.length;
+  }
 
   genSamp(s: number){
     

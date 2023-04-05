@@ -183,8 +183,8 @@ invalidRange = false;
 types = ["Race","Gender","Age","Race Prop","Attributes","Face Measurements"]
 info = ""
 filterObject = {
-  feature: "Race",
-  category: 'r',
+  feature: "Age",
+  category: 'a',
   max: -1,
   min: -1,
   exclude: "White",
@@ -200,7 +200,7 @@ selectFeat(t: string){
       this.filterObject.info = "Male faces will be removed"
       this.filterObject.feature = "Gender";
       this.filterObject.category = "g";
-      this.filterObject.exclude = "Male";
+      this.filterObject.exclude = "M";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -209,7 +209,7 @@ selectFeat(t: string){
       this.filterObject.info = "Female faces will be removed"
       this.filterObject.feature = "Gender";
       this.filterObject.category = "g";
-      this.filterObject.exclude = "Female";
+      this.filterObject.exclude = "F";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -218,7 +218,7 @@ selectFeat(t: string){
       this.filterObject.info = "White faces will be removed"
       this.filterObject.feature = "White";
       this.filterObject.category = "r";
-      this.filterObject.exclude = "White";
+      this.filterObject.exclude = "W";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -227,7 +227,7 @@ selectFeat(t: string){
       this.filterObject.info = "Race: Other faces will be removed"
       this.filterObject.feature = "Other";
       this.filterObject.category = "r";
-      this.filterObject.exclude = "Other";
+      this.filterObject.exclude = "O";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -236,7 +236,7 @@ selectFeat(t: string){
       this.filterObject.info = "Asian faces will be removed"
       this.filterObject.feature = "Asian";
       this.filterObject.category = "r";
-      this.filterObject.exclude = "Asian";
+      this.filterObject.exclude = "A";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -245,7 +245,7 @@ selectFeat(t: string){
       this.filterObject.info = "Latino faces will be removed"
       this.filterObject.feature = "Latino";
       this.filterObject.category = "r";
-      this.filterObject.exclude = "Latino";
+      this.filterObject.exclude = "L";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -254,7 +254,7 @@ selectFeat(t: string){
       this.filterObject.info = "Black faces will be removed"
       this.filterObject.feature = "Black";
       this.filterObject.category = "r";
-      this.filterObject.exclude = "Black";
+      this.filterObject.exclude = "B";
       this.$emit("update:filterObject", this.filterObject);
       this.$emit("createNewFilter");
       this.closeThis();
@@ -321,6 +321,9 @@ checkValidity(){
   else{
     this.invalidRange = false;
     this.i2 = "";
+  }
+  if (this.temp0==="Age"){
+    this.temp1 = "Age"
   }
   if (this.temp1 === "_____"){
     this.invalidRange = true;
