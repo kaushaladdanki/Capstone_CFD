@@ -224,7 +224,7 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Other":
-      this.filterObject.info = "Race: Other faces will be removed"
+      this.filterObject.info = "Race: Other faces will be removed";
       this.filterObject.feature = "Other";
       this.filterObject.category = "r";
       this.filterObject.exclude = "O";
@@ -233,7 +233,8 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Asian":
-      this.filterObject.info = "Asian faces will be removed"
+      this.closeThis();
+      this.filterObject.info = "Asian faces will be removed";
       this.filterObject.feature = "Asian";
       this.filterObject.category = "r";
       this.filterObject.exclude = "A";
@@ -242,7 +243,7 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Latino":
-      this.filterObject.info = "Latino faces will be removed"
+      this.filterObject.info = "Latino faces will be removed";
       this.filterObject.feature = "Latino";
       this.filterObject.category = "r";
       this.filterObject.exclude = "L";

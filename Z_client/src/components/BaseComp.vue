@@ -30,7 +30,7 @@
     <!-- Display of generated sample -->
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
-    <!-- <button @click="genSamp()">Clear Sample</button> -->
+    <!-- <button @click="genSamp()">Clear Sample</button> 
     BigFO: {{ bigFO }}
     <br />
     <br />
@@ -44,7 +44,7 @@
     <br />
     <br />
     testA: {{ testA }}
-    <br />
+    <br /> -->
     <!-- Table for demo display. -->
     <table>
       <tr>
@@ -108,11 +108,11 @@ export default class BaseComp extends Vue {
   samp = ["WM-134","WM-112","WM-36","WM-201","WM-67","WM-43","WM-192","WM-177","WM-224", "WM-208", "WM-29", "WM-113", "WM-91", "WM-169"]
   headerIndex: [number] = [0];
   bigFO = {
-  feature: "Racer",
-  category: 'rr',
+  feature: "defFeat",
+  category: 'defCat',
   max: -11,
   min: -11,
-  exclude: "Whitey",
+  exclude: "defEx",
   info: ""
   }
   bigList = [this.bigFO]
@@ -125,7 +125,7 @@ export default class BaseComp extends Vue {
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
       var arrObj = [];
-      var lines = this.testCSV.split('\n');
+      var lines = this.cfdCSV.split('\n');
       var headers = lines[0].split(',');
       var count = 1;
 
@@ -139,9 +139,10 @@ export default class BaseComp extends Vue {
       }
       // this.myArray = arrObj.slice(1);
       this.feats = headers;
-      this.dbSize = this.faces.length;
       this.dbFaces = this.faces;
       this.dbFaces.shift();
+      this.dbSize = this.faces.length;
+      this.bigList.shift();
   }
 
   toggleModalFilter() {
@@ -202,7 +203,7 @@ export default class BaseComp extends Vue {
     for(var i in this.bigList){
       switch (this.bigList[i].category){
         case "g":
-          var tempFaces = [[""]]
+          var tempFaces = [[""]];
           var tempFeat = this.bigList[i].exclude;
           for(var j in this.dbFaces){
             if(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)] !== this.bigList[i].exclude){
@@ -215,7 +216,17 @@ export default class BaseComp extends Vue {
           this.test = tempFeat;
           break;
         case "r":
-            
+          var tempF2 = [[""]];
+          for(var k in this.dbFaces){
+            if(this.dbFaces[k][this.feats.indexOf("Race")] !== this.bigList[i].exclude){
+              tempF2.push(this.dbFaces[k])
+              this.testA.push(this.dbFaces[k][this.feats.indexOf("Race")])
+              //this.testA.push(k)
+            }
+          }
+          tempF2.shift();
+          this.dbFaces = tempF2;
+          this.test = this.dbFaces[1][this.feats.indexOf(this.bigList[i].feature)];
           break;
         case "a":
           
