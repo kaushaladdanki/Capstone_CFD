@@ -296,8 +296,11 @@ createFilter(){
     this.closeThis();
   }
   else{
+    this.closeThis();
     this.filterObject.feature = this.temp1;
     this.filterObject.info = this.info;
+    this.filterObject.max = this.max;
+    this.filterObject.min = this.min;
     this.$emit("update:filterObject", this.filterObject);
     this.$emit("createNewFilter");
     this.closeThis();

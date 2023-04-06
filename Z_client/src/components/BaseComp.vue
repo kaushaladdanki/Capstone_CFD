@@ -30,7 +30,7 @@
     <!-- Display of generated sample -->
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
-    <!-- <button @click="genSamp()">Clear Sample</button> 
+    <!-- <button @click="genSamp()">Clear Sample</button>  
     BigFO: {{ bigFO }}
     <br />
     <br />
@@ -39,12 +39,12 @@
     <br />
     dbFaces: {{ dbFaces }}
     <br />
-    <br />
+    <br />-->
     test: {{ test }}
     <br />
     <br />
     testA: {{ testA }}
-    <br /> -->
+    <br /> 
     <!-- Table for demo display. -->
     <table>
       <tr>
@@ -118,7 +118,7 @@ export default class BaseComp extends Vue {
   bigList = [this.bigFO]
   usedFeats = [""]
   dbSize = 0
-  test = "default"
+  test = -9
   testA = ["default"]
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
@@ -126,6 +126,7 @@ export default class BaseComp extends Vue {
   readCSV(){
       var arrObj = [];
       var lines = this.cfdCSV.split('\n');
+      //var lines = this.testCSV.split('\n');
       var headers = lines[0].split(',');
       var count = 1;
 
@@ -208,28 +209,36 @@ export default class BaseComp extends Vue {
           for(var j in this.dbFaces){
             if(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)] !== this.bigList[i].exclude){
               tempFaces.push(this.dbFaces[j])
-              this.testA.push(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)])
             }
           }
           tempFaces.shift();
           this.dbFaces = tempFaces;
-          this.test = tempFeat;
           break;
         case "r":
           var tempF2 = [[""]];
           for(var k in this.dbFaces){
             if(this.dbFaces[k][this.feats.indexOf("Race")] !== this.bigList[i].exclude){
               tempF2.push(this.dbFaces[k])
-              this.testA.push(this.dbFaces[k][this.feats.indexOf("Race")])
-              //this.testA.push(k)
             }
           }
           tempF2.shift();
           this.dbFaces = tempF2;
-          this.test = this.dbFaces[1][this.feats.indexOf(this.bigList[i].feature)];
           break;
         case "a":
-          
+          //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
+          var tempF3 = [[""]];
+          var tempFeat2 = this.bigList[i].feature;
+          for(var m in this.dbFaces){
+            if((Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) >= this.bigList[i].min) && 
+            (Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) <= this.bigList[i].max)) {
+              tempF3.push(this.dbFaces[m])
+              this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)])
+            }
+          }
+          tempF3.shift();
+          this.dbFaces = tempF3;
+          this.test = Number(this.dbFaces[1][this.feats.indexOf(tempFeat2)])
+          //this.test = this.dbFaces[1][this.feats.indexOf(this.bigList[i].feature)];
           break;
       }
     }
