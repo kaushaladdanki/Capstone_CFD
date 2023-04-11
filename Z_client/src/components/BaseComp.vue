@@ -30,7 +30,7 @@
     <!-- Display of generated sample -->
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
-    <!-- <button @click="genSamp()">Clear Sample</button>  
+    <!-- <button @click="genSamp()">Clear Sample</button>   -->
     BigFO: {{ bigFO }}
     <br />
     <br />
@@ -39,7 +39,7 @@
     <br />
     dbFaces: {{ dbFaces }}
     <br />
-    <br />-->
+    <br />
     test: {{ test }}
     <br />
     <br />
@@ -119,14 +119,14 @@ export default class BaseComp extends Vue {
   usedFeats = [""]
   dbSize = 0
   test = -9
-  testA = ["default"]
+  testA = [-1]
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
       var arrObj = [];
-      var lines = this.cfdCSV.split('\n');
-      //var lines = this.testCSV.split('\n');
+      //var lines = this.cfdCSV.split('\n');
+      var lines = this.testCSV.split('\n');
       var headers = lines[0].split(',');
       var count = 1;
 
@@ -229,16 +229,19 @@ export default class BaseComp extends Vue {
           var tempF3 = [[""]];
           var tempFeat2 = this.bigList[i].feature;
           for(var m in this.dbFaces){
-            if((Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) >= this.bigList[i].min) && 
-            (Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) <= this.bigList[i].max)) {
-              tempF3.push(this.dbFaces[m])
-              this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)])
+            if((Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) > this.bigList[i].min) && 
+            (Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) < this.bigList[i].max)) {
+              tempF3.push(this.dbFaces[m]);
+              //this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)])
             }
+            //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
           tempF3.shift();
+          this.testA = [this.bigList[i].max, this.bigList[i].min]
           this.dbFaces = tempF3;
-          this.test = Number(this.dbFaces[1][this.feats.indexOf(tempFeat2)])
+          //this.test = Number(this.dbFaces[1][this.feats.indexOf(tempFeat2)])
           //this.test = this.dbFaces[1][this.feats.indexOf(this.bigList[i].feature)];
+          //this.test = this.dbFaces.length;
           break;
       }
     }
@@ -258,7 +261,7 @@ export default class BaseComp extends Vue {
   }
 
   genSamp(s: number){
-    
+    // 
     this.displaySample = !this.displaySample;
   }
 

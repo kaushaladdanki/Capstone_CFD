@@ -191,6 +191,7 @@ filterObject = {
   info: ""
 }
 
+// The bug with the modal not closing may be happening because it is being told to close twice? so it closes then opens
 selectFeat(t: string){
   switch (t) {
     default:
@@ -296,11 +297,10 @@ createFilter(){
     this.closeThis();
   }
   else{
-    this.closeThis();
     this.filterObject.feature = this.temp1;
     this.filterObject.info = this.info;
-    this.filterObject.max = this.max;
-    this.filterObject.min = this.min;
+    this.filterObject.max = this.temp3;
+    this.filterObject.min = this.temp2;
     this.$emit("update:filterObject", this.filterObject);
     this.$emit("createNewFilter");
     this.closeThis();
