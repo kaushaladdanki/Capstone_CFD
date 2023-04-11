@@ -22,9 +22,9 @@
 import { Options, Vue } from 'vue-class-component';
 
 export default class Sample extends Vue {
-  sampleSize = 20;
+  sampleSize = 5;
   dbSize = 30;
-  test = 20
+  test = 5
 
   tester(){
     this.test = Math.floor(Math.random() * 100)
@@ -34,7 +34,7 @@ export default class Sample extends Vue {
       return (this.sampleSize > 0 && this.sampleSize < this.dbSize-1);
   }
   genSample(){
-      this.$emit("genSample");
+      this.$emit("genSample", this.sampleSize);
       this.closeThis();
   }  
   

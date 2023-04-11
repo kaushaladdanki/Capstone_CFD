@@ -28,23 +28,18 @@
     <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
     <button @click="toggleModalSample()">Generate Sample</button>
     <!-- Display of generated sample -->
+    <br />
+    Test output: {{ test }}
+    <br />
+    <br />
+    Test output array: {{ test2dA }}
+    <br />
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
-    <!-- <button @click="genSamp()">Clear Sample</button>   
-    BigFO: {{ bigFO }}
-    <br />
-    <br />
-    bigList: {{ bigList }}
-    <br />
-    <br />
-    dbFaces: {{ dbFaces }}
-    <br />
-    <br />
-    test: {{ test }}
-    <br />
-    <br />
-    testA: {{ testA }} 
-    <br /> -->
+
+    <!-- Handle machine learning modal -->
+    <MachineLearning v-if="showModalML" @closeModalML="toggleModalML()" />
+    <button @click="toggleModalML()">Test ML</button>
     
     <!-- Table for demo display. 
     <table>
@@ -77,11 +72,6 @@
       </tr>
     </table>
     -->
-
-    <!-- Handle machine learning modal 
-    <MachineLearning v-if="showModalML" @closeModalML="toggleModalML()" />
-    <button @click="toggleModalML()">Test ML</button>
-    -->
   </div>
 </template>
 
@@ -98,16 +88,13 @@ import Sample from './Sample.vue';
 })
 
 export default class BaseComp extends Vue {
-  showModalFilter = false
-  showModalML = false
-  showModalSample = false
-  displaySample = false
-  filterList = [""]
-  feats = [""];
-  faces = [[""]];
-  dbFaces = [[""]];
-  samp = ["WM-134","WM-112","WM-36","WM-201","WM-67","WM-43","WM-192","WM-177","WM-224", "WM-208", "WM-29", "WM-113", "WM-91", "WM-169"]
-  headerIndex: [number] = [0];
+  // Booleans that handle modal displays
+  showModalFilter = false;
+  showModalML = false;
+  showModalSample = false;
+  displaySample = false;
+
+  // This is a filter object
   bigFO = {
   feature: "defFeat",
   category: 'defCat',
@@ -116,11 +103,18 @@ export default class BaseComp extends Vue {
   exclude: "defEx",
   info: ""
   }
-  bigList = [this.bigFO]
-  usedFeats = [""]
-  dbSize = 0
-  test = -9
-  testA = [-1]
+  
+  bigList = [this.bigFO];
+  filterList = [""];
+  feats = [""];
+  faces = [[""]];
+  dbFaces = [[""]];
+  headerIndex: [number] = [0];
+  usedFeats = [""];
+  dbSize = 0;
+  samp = [""];
+  test = 0;
+  test2dA = [[""]];
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
@@ -192,12 +186,13 @@ export default class BaseComp extends Vue {
   // called after each add or remove filter
   // This takes the entire database and applies each filter in the queue
   // after each filter is applied, the total number of faces in database to be displayed is updated.
-  // the filtered faces array is also updated, that is the one passed to the sample generation feature
+  // the filtered faces array is also updated, that is the one passed to the sample generation function
   updateFilter(){
     this.dbFaces = this.faces;
     // read through each filter in bigList
     for(var i in this.bigList){
       switch (this.bigList[i].category){
+        // handles Gender filters
         case "g":
           var tempFaces = [[""]];
           var tempFeat = this.bigList[i].exclude;
@@ -209,6 +204,7 @@ export default class BaseComp extends Vue {
           tempFaces.shift();
           this.dbFaces = tempFaces;
           break;
+        // handles Race filters
         case "r":
           var tempF2 = [[""]];
           for(var k in this.dbFaces){
@@ -219,6 +215,7 @@ export default class BaseComp extends Vue {
           tempF2.shift();
           this.dbFaces = tempF2;
           break;
+        // handles other, numerical filters
         case "a":
           //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
           var tempF3 = [[""]];
@@ -231,7 +228,6 @@ export default class BaseComp extends Vue {
             //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
           tempF3.shift();
-          this.testA = [this.bigList[i].max, this.bigList[i].min]
           this.dbFaces = tempF3;
           break;
       }
@@ -239,9 +235,24 @@ export default class BaseComp extends Vue {
     this.dbSize = this.dbFaces.length;
   }
 
+  // This function will be called when the user submits a number using the sample modal form
+  // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
   genSamp(s: number){
-    // 
+    // s is the sample size recieved from the sample modal form
+    // samp is the name of the array of strings that is displayed once this function exicutes
+
+    this.test = s;
+    this.samp = ["the faces","of the sample"];
+
     this.displaySample = !this.displaySample;
+  }
+
+  // returns a 2d array [[face, face], [face,face], ...] 
+  // This array can be indexed as clusters[faceclusters][faces]
+  genClusters(s:number){ 
+    // for testing purposes, clusters has 5 clusters of 1-5 faces
+    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    return clusters
   }
 
   testCSV = `Target,Race,Gender,Age,NumberofRaters,Female_prop,Male_prop,Asian_prop,Black_prop,Latino_prop,Multi_prop,Other_prop,White_prop,Afraid,Angry,Attractive,Babyface,Disgusted,Dominant,Feminine,Happy,Masculine,Prototypic,Sad,Suitability,Surprised,Threatening,Trustworthy,Unusual,Luminance_median,Nose_Width,Nose_Length,Lip_Thickness,Face_Length,R_Eye_H,L_Eye_H,Avg_Eye_Height,R_Eye_W,L_Eye_W,Avg_Eye_Width,Face_Width_Cheeks,Face_Width_Mouth,Forehead,Pupil_Top_R,Pupil_Top_L,Asymmetry_pupil_top,Pupil_Lip_R,Pupil_Lip_L,Asymmetry_pupil_lip,BottomLip_Chin,Midcheek_Chin_R,Midcheek_Chin_L,Cheeks_avg,Midbrow_Hairline_R,Midbrow_Hairline_L,Faceshape,Heartshapeness,Noseshape,LipFullness,EyeShape,EyeSize,UpperHeadLength,MidfaceLength,ChinLength,ForeheadHeight,CheekboneHeight,CheekboneProminence,FaceRoundness,fWHR
