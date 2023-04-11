@@ -191,7 +191,6 @@ filterObject = {
   info: ""
 }
 
-// The bug with the modal not closing may be happening because it is being told to close twice? so it closes then opens
 selectFeat(t: string){
   switch (t) {
     default:

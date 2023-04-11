@@ -30,7 +30,7 @@
     <!-- Display of generated sample -->
     <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
-    <!-- <button @click="genSamp()">Clear Sample</button>   -->
+    <!-- <button @click="genSamp()">Clear Sample</button>   
     BigFO: {{ bigFO }}
     <br />
     <br />
@@ -43,9 +43,10 @@
     test: {{ test }}
     <br />
     <br />
-    testA: {{ testA }}
-    <br /> 
-    <!-- Table for demo display. -->
+    testA: {{ testA }} 
+    <br /> -->
+    
+    <!-- Table for demo display. 
     <table>
       <tr>
         <th v-for="feat in feats" :key="feat" >
@@ -75,7 +76,7 @@
         </td>
       </tr>
     </table>
-
+    -->
 
     <!-- Handle machine learning modal 
     <MachineLearning v-if="showModalML" @closeModalML="toggleModalML()" />
@@ -125,20 +126,17 @@ export default class BaseComp extends Vue {
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
       var arrObj = [];
-      //var lines = this.cfdCSV.split('\n');
-      var lines = this.testCSV.split('\n');
+      var lines = this.testCSV.split('\n');  //first 3 faces in the database
+      //var lines = this.cfdCSV.split('\n'); // uncomment this to use full database
       var headers = lines[0].split(',');
       var count = 1;
 
       for (var  i = 1; i < lines.length; i++){
         var rowData = lines[i].split(',');
-        console.log(`${rowData}`);  //sanity check
         this.faces.push(rowData);
         this.headerIndex.push(count);
         count++;
-        // arrObj[i] = Object.assign(headers.map((m, n) => ({[m]: rowData[n]}) ));
       }
-      // this.myArray = arrObj.slice(1);
       this.feats = headers;
       this.dbFaces = this.faces;
       this.dbFaces.shift();
@@ -174,7 +172,6 @@ export default class BaseComp extends Vue {
 
   // Remove filter from list
   // add feature name back to features list for filter form
-  // probably easiest way to update database is to just redo adding filters to the complete database each time
   removeFilter(f:{feature:string, category:string, max:number, min:number, exclude:string, info:string}){
     for(var i in this.bigList){
       if(this.bigList[i].info===f.info){
@@ -189,8 +186,6 @@ export default class BaseComp extends Vue {
       }
     }
     this.updateFilter();
-    //var index = this.bigList.indexOf(f)-1;
-    //this.bigList = this.bigList.filter(isObj(f));
   }
 
 
@@ -232,31 +227,15 @@ export default class BaseComp extends Vue {
             if((Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) > this.bigList[i].min) && 
             (Number(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) < this.bigList[i].max)) {
               tempF3.push(this.dbFaces[m]);
-              //this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)])
             }
             //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
           tempF3.shift();
           this.testA = [this.bigList[i].max, this.bigList[i].min]
           this.dbFaces = tempF3;
-          //this.test = Number(this.dbFaces[1][this.feats.indexOf(tempFeat2)])
-          //this.test = this.dbFaces[1][this.feats.indexOf(this.bigList[i].feature)];
-          //this.test = this.dbFaces.length;
           break;
       }
     }
-
-    // handle filter based on category
-    // for race and gender, remove all faces with the exclusionary feature 
-    
-    // for numerical categories, remove faces with improper elemental values
-    /* This but use recursion?
-    for(var j in this.usedFeats){
-      if(this.usedFeats[j]===f.feature){
-        this.usedFeats.splice(this.usedFeats.indexOf(this.usedFeats[j]),1);
-      }
-    } 
-    */
     this.dbSize = this.dbFaces.length;
   }
 
