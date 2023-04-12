@@ -5,7 +5,7 @@
       <button class="close-button" type="button" @click.prevent="closeThis">X</button>
       <header >
         <!--<Navbar @setValue="setFeature()"/> -->
-        Create A Filter
+        <h3>Create A Filter</h3>
       </header>
       <br />
       Select Feature type:

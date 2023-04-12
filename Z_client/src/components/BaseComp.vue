@@ -1,45 +1,77 @@
 <template>
-  <div class="hello">
-    <div class="bigHead">
-      <h1>Chicago Face Database: Sample Generator</h1>
-    </div>
-    <!-- load csv (in this case we are parsing the string representing the CSV)-->
-    <button class="submit" @click="readCSV" >DemoDisplay</button>
+  <div id="wrapper" class="flex-container">
+    <header role="banner" style="width: 100%">
+      <h1>Chicago Face Database</h1>
+      <div class="headerDiv">
+        <h2>Sample Generator</h2>
+        <!-- Explain the purpose of the site -->
+        <p>The CFD Sample Generator will use machine learning to create a subset of faces from the CFD. 
+          There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
+          The faces in the generated sample will be displayed in text.</p>
+      </div>
+    </header>
+
+    <!-- load csv (in this case we are calling a function that parses the string representing the CSV) -->
+    <button class="submit" @click="readCSV" >Load Database</button>
     <br />
-    <br />
-    DBsize = {{ dbSize }}
-    <br />
-    <br />
-    <!-- Handle filter modal -->
-    <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
-    :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
-    <button @click="toggleModalFilter()" >Add Filter</button>
-    <br />
-    <!-- Display of current filters -->
-    Current Filter:
-    <div class="filter" v-for="f in bigList" :key="f.info">
-      <p class="filter-text">
-        {{f.info}}
-        <button v-if="f.info != ''" class="close-button" type="button" @click.prevent="removeFilter(f)">X</button>
-      </p> 
-    </div>
-    <br />
-    <!-- Handle sample modal -->
-    <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
-    <button @click="toggleModalSample()">Generate Sample</button>
-    <!-- Display of generated sample -->
-    <br />
-    Test output: {{ test }}
-    <br />
-    <br />
-    Test output array: {{ test2dA }}
-    <br />
-    <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
     <br />
 
+    <main role="main">
+
+      <section role="region" aria-label="Sample">
+        <h2>Sample</h2>
+        <!-- Handle sample modal -->
+        <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
+        <button @click="toggleModalSample()">Generate Sample</button>
+        <!-- Display of generated sample -->
+        <br />
+        <br />
+        Number of Faces in Current Database = {{ dbSize }}
+        <br />
+        <br />
+        Test output: {{ test }}
+        <br />
+        <br />
+        Test output array: {{ test2dA }}
+        <br />
+        <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
+        <br />
+      </section>
+
+      <aside role="complementary" aria-label="Filter">
+        <h2>Filter</h2>
+        <p>Follow these instructiosn to add a filter to the dataset.</p>
+        <br />
+        <br />
+        <!-- Handle filter modal -->
+        <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
+        :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
+        <button @click="toggleModalFilter()" >Add Filter</button>
+        <br />
+        <!-- Display of current filters -->
+        Current Filter:
+        <div class="filter" v-for="f in bigList" :key="f.info">
+          <p class="filter-text">
+            {{f.info}}
+            <button v-if="f.info != ''" class="close-button" type="button" @click.prevent="removeFilter(f)">X</button>
+          </p> 
+        </div>
+        <br />
+      </aside>
+
+    </main>
     <!-- Handle machine learning modal -->
     <MachineLearning v-if="showModalML" @closeModalML="toggleModalML()" />
     <button @click="toggleModalML()">Test ML</button>
+    <br />
+    <br />
+    <footer>
+      <!-- Explain the app -->
+      <h2>How does the CFD Sample Generator work?</h2>
+      <p>The sampling solution will use K-Means clustering to create strata that will allow for the generated sample to best represent the total population of the database.</p>
+    </footer>
+    
+    
     
     <!-- Table for demo display. 
     <table>
@@ -873,23 +905,35 @@ export default class BaseComp extends Vue {
 .blue{fill: @paleblue}
 .tan{fill: @tan}
 .brown{fill: @brown}
-h3 {
-  margin: 40px 0 0;
-}
 .bigHead{
   background-color: @brown;
-  top: 0;
+  top: 0
+  ;
 }
 th{
   padding: 2.5px
 }
+
 h1 {
   background-color: @purp;
   text-align: left;
-  color: white;
-  width: 100%;
   padding: 20px 0px 20px 20px;
+  font-size: 3.3rem;
+  color: #ffffff;
+  flex: 2;
+  text-transform: uppercase;
 }
+
+h2 {
+  font-size: 2rem;
+  flex: 3;
+}
+
+p, li {
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -901,8 +945,56 @@ li {
 a {
   color: #42b983;
 }
+
 table, th, td {
   border: 1px solid black;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  margin-bottom: 10px;
+  display: flex;
+}
+
+//for text logo
+header img {
+  display: block;
+  height: 60px;
+  padding-top: 20.15px;
+}
+
+main {
+  flex: 5;
+  display: flex;
+}
+
+article, section {
+  flex: 1;
+}
+
+aside {
+  flex: 1;
+  margin-left: 10px;
+  padding: 1%;
+}
+
+footer {
+  margin-top: 10px;
+}
+
+.flex-container {
+  padding: 1%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.headerDiv {
+  flex: 3;
+  margin: 1%;
 }
 
 </style>
