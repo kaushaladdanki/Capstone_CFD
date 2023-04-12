@@ -1,9 +1,9 @@
 <template>
   <div id="wrapper" class="flex-container">
     <header role="banner" style="width: 100%">
-      <h1>Chicago Face Database</h1>
+      <img alt="Chicago Face Database" src="./assets/header.png">
       <div class="headerDiv">
-        <h2>Sample Generator</h2>
+        <h1>Sample Generator</h1>
         <!-- Explain the purpose of the site -->
         <p>The CFD Sample Generator will use machine learning to create a subset of faces from the CFD. 
           There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
@@ -915,22 +915,20 @@ th{
 }
 
 h1 {
-  background-color: @purp;
-  text-align: left;
-  padding: 20px 0px 20px 20px;
-  font-size: 3.3rem;
+  text-align: center;
+  font-size: 2.3rem;
   color: #ffffff;
   flex: 2;
-  text-transform: uppercase;
+  padding-top: 10px;
 }
 
 h2 {
-  font-size: 2rem;
+  font-size: 1.7rem;
   flex: 3;
 }
 
 p, li {
-  font-size: 1.6rem;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -941,9 +939,6 @@ ul {
 li {
   display: inline-block;
   margin: 0 10px;
-}
-a {
-  color: #42b983;
 }
 
 table, th, td {
@@ -962,9 +957,7 @@ header {
 
 //for text logo
 header img {
-  display: block;
-  height: 60px;
-  padding-top: 20.15px;
+  flex: 1;
 }
 
 main {
@@ -994,7 +987,11 @@ footer {
 
 .headerDiv {
   flex: 3;
-  margin: 1%;
+  background-color: @purp;
+  color: #ffffff;
+  text-align: center;
+  padding-left: 10px;
+  padding-right: 20px;
 }
 
 </style>
