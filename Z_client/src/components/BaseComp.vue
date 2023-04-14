@@ -8,32 +8,31 @@
         <p>The CFD Sample Generator will use machine learning to create a subset of faces from the CFD. 
           There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
           The faces in the generated sample will be displayed in text.</p>
+          <!-- load csv (in this case we are calling a function that parses the string representing the CSV) -->
+          <button class="submit" @click="readCSV" >Load Database</button>
       </div>
     </header>
 
-    <!-- load csv (in this case we are calling a function that parses the string representing the CSV) -->
-    <button class="submit" @click="readCSV" >Load Database</button>
     <br />
     <br />
 
     <main role="main">
 
       <section role="region" aria-label="Sample">
-        <h2>Sample</h2>
+        <h2 value="Sample"></h2>
+        <h3>Number of Faces in Current Database = {{ dbSize }}</h3>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
-        <button @click="toggleModalSample()">Generate Sample</button>
+        <button @click="toggleModalSample()" style="height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
         <!-- Display of generated sample -->
-        <br />
-        <br />
-        Number of Faces in Current Database = {{ dbSize }}
-        <br />
-        <br />
+
+        <!--
         Test output: {{ test }}
         <br />
         <br />
         Test output array: {{ test2dA }}
         <br />
+        -->
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
       </section>
@@ -42,11 +41,11 @@
         <h2>Filter</h2>
         <p>Follow these instructiosn to add a filter to the dataset.</p>
         <br />
-        <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
         :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
         <button @click="toggleModalFilter()" >Add Filter</button>
+        <br />
         <br />
         <!-- Display of current filters -->
         Current Filter:
@@ -60,9 +59,11 @@
       </aside>
 
     </main>
-    <!-- Handle machine learning modal -->
+    <!-- Handle machine learning modal 
     <MachineLearning v-if="showModalML" @closeModalML="toggleModalML()" />
-    <button @click="toggleModalML()">Test ML</button>
+    <button @click="toggleModalML()">Test ML</button>  -->
+    <br />
+    <br />
     <br />
     <br />
     <footer>
@@ -152,8 +153,8 @@ export default class BaseComp extends Vue {
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
       var arrObj = [];
-      var lines = this.testCSV.split('\n');  //first 3 faces in the database
-      //var lines = this.cfdCSV.split('\n'); // uncomment this to use full database
+      //var lines = this.testCSV.split('\n');  //first 3 faces in the database
+      var lines = this.cfdCSV.split('\n'); // uncomment this to use full database
       var headers = lines[0].split(',');
       var count = 1;
 
@@ -275,6 +276,15 @@ export default class BaseComp extends Vue {
 
     this.test = s;
     this.samp = ["the faces","of the sample"];
+    var tvar = 0;
+    var tsamp = [""]
+    var tbs = ["AF-209","AF-234","AF-210","AF-239","AF-211","AF-293","AF-423","AF-514","AF-269","AF-272","AF-277","AF-201","AF-223","AF-299","AF-342","AF-419"]
+    while (tvar < s){
+      tsamp.push(tbs[tvar])
+      tvar = tvar + 1;
+    }
+    tsamp.shift()
+    this.samp = tsamp;
 
     this.displaySample = !this.displaySample;
   }
@@ -925,11 +935,13 @@ h1 {
 h2 {
   font-size: 1.7rem;
   flex: 3;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 p, li {
   font-size: 1rem;
   line-height: 1.5;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 ul {
@@ -973,6 +985,9 @@ aside {
   flex: 1;
   margin-left: 10px;
   padding: 1%;
+  border-left-style: solid;
+  border-left-width: 3px;
+  border-left-color: #222249;
 }
 
 footer {

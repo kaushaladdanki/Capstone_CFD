@@ -3,154 +3,143 @@
   <div class="modal-overlay" id="fModal" @click.prevent="checkValidity">     
     <div class="modal" >
       <button class="close-button" type="button" @click.prevent="closeThis">X</button>
-      <header >
-        <!--<Navbar @setValue="setFeature()"/> -->
-        <h3>Create A Filter</h3>
-      </header>
-      <br />
-      Select Feature type:
-      <select v-model="temp0">
-        <option disabled value="">Select Feature Type</option>
-        <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
-      </select>
-      <br />
+      <fieldset>
+        <Legend>Create A Filter</legend>
+        <br />
+        <label for="selFeat">Select Feature type:</label>
+        <select id="selFeat" v-model="temp0">
+          <option disabled value="">Select Feature Type</option>
+          <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
+        </select>
+        <br />
+        
+        <!-- could potentially base string bassed to feat off of string used in a v-for from a list displayed with {{ like above }}-->
+        <div v-if="temp0==='Race'" >
+          <br />
+          <br />
+          <label>Select feature to be removed from dataset.</label>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Asian')">Asian</button>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Black')">Black</button>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Latino')">Latino</button>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('White')">White</button>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Other')">Other</button>
+        </div>
+
+        <div v-if="temp0==='Gender'" >
+          <br />
+          <br />
+          <label>Select feature to be removed from dataset.</label>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Male')">Male</button>
+          <br />
+          <br />
+          <button type="button" @click.prevent="selectFeat('Female')">Female</button>
+        </div>
+
+        <div v-if="temp0==='Age'">
+          <br />
+          <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
+          <div>
+            <label for="aMin">Select Minimum Value of Range</label>
+            <input id="aMin" type="number" v-model="temp2"/>
+          </div>
+          <br />
+          <div>
+            <label for="aMax">Select Maximum Value of Range</label>
+            <input id="aMax" type="number" v-model="temp3" />
+          </div>
+          <div class="modal-header">
+              <p>{{ info }}</p>
+              <p>{{ i2 }}</p>
+          </div>
+          <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
+        </div>
+
+        <div v-if="temp0==='Race Prop'" >
+          <label for="pType">Select a prop:</label>
+          <select id="pType" v-model="temp1">
+            <option disabled value="">Select Feature</option>
+            <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
+          </select>
+          <br />
+          <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
+          <br />
+          <div>
+            <label for="pMin">Select Minimum Value of Range</label>
+            <input id="pmin" type="number" v-model="temp2"  />
+          </div>
+          <br />
+          <div>
+            <label for="pMax">Select Maximum Value of Range</label>
+            <input id="pMax" type="number" v-model="temp3" />
+          </div>
+          <div class="modal-header">
+              <p>{{info }}</p>
+              <p>{{ i2 }}</p>
+          </div>
+          <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
+        </div>
+
+        <div v-if="temp0==='Attributes'" >
+          <label for="atFeat">Select a Feature:</label>
+          <select id="atFeat" v-model="temp1" required>
+            <option disabled value="">Select Feature</option>
+            <option v-for="i in feats.slice(13,29)" :key="i" :value="i" >{{ i }}</option>
+          </select>
+          <br />
+          <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
+          <div>
+            <label for="atMin">Select Minimum Value of Range</label>
+            <input id="atMin" type="number" v-model="temp2"  />
+          </div>
+          <br />
+          <div>
+            <label for="atMax">Select Maximum Value of Range</label>
+            <input id="atMax" type="number" v-model="temp3" />
+          </div>
+          <div class="modal-header">
+              <p>{{ info }}</p>
+              <p>{{ i2 }}</p>
+          </div>
+          <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
+        </div>
+
+        <div v-if="temp0==='Face Measurements'" >
+          <label for="fmFeat">Select a Feature:</label>
+          <select id="fmFeat" v-model="temp1" required>
+            <option disabled value="">Select Feature</option>
+            <option v-for="i in feats.slice(56,68)" :key="i" :value="i" >{{ i }}</option>
+          </select>
+          <br />
+          <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
+          <div>
+            <label for="fmMin">Select Minimum Value of Range</label>
+            <input id="fmMin" type="number" v-model="temp2"  />
+          </div>
+          <br />
+          <div>
+            <label for="fmMax">Select Maximum Value of Range</label>
+            <input id="fmMax" type="number" v-model="temp3" />
+          </div>
+          <div class="modal-header">
+              <p>{{ info }}</p>
+              <p>{{ i2 }}</p>
+          </div>
+          <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
+        </div>
+      </fieldset>
       
-      <!-- could potentially base string bassed to feat off of string used in a v-for from a list displayed with {{ like above }}-->
-      <div v-if="temp0==='Race'" >
-        <br />
-        <br />
-        Select feature to be removed from dataset.
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Asian')">Asian</button>
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Black')">Black</button>
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Latino')">Latino</button>
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('White')">White</button>
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Other')">Other</button>
-      </div>
-
-      <div v-if="temp0==='Gender'" >
-        <br />
-        <br />
-        Select feature to be removed from dataset.
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Male')">Male</button>
-        <br />
-        <br />
-        <button type="button" @click.prevent="selectFeat('Female')">Female</button>
-      </div>
-
-      <div v-if="temp0==='Age'">
-        <br />
-        <br />
-        Range for selected feature must be between {{ min }} and {{ max }}
-        <br />
-        <br />
-        <div>
-          Select Minimum Value of Range
-          <input type="number" v-model="temp2"/>
-        </div>
-        <br />
-        <div>
-          Select Maximum Value of Range
-          <input type="number" v-model="temp3" />
-        </div>
-        <div class="modal-header">
-            <h2>{{ info }}</h2>
-            <h2>{{ i2 }}</h2>
-        </div>
-        <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
-      </div>
-
-      <div v-if="temp0==='Race Prop'" >
-        Select a prop:
-        <select v-model="temp1">
-          <option disabled value="">Select Feature</option>
-          <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
-        </select>
-        <br />
-        <br />
-        Range for selected feature must be between {{ min }} and {{ max }}
-        <br />
-        <br />
-        <div>
-          Select Minimum Value of Range
-          <input type="number" v-model="temp2"  />
-        </div>
-        <br />
-        <div>
-          Select Maximum Value of Range
-          <input type="number" v-model="temp3" />
-        </div>
-        <div class="modal-header">
-            <h2>{{info }}</h2>
-            <h2>{{ i2 }}</h2>
-        </div>
-        <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
-      </div>
-
-      <div v-if="temp0==='Attributes'" >
-        Select a Feature:
-        <select v-model="temp1" required>
-          <option disabled value="">Select Feature</option>
-          <option v-for="i in feats.slice(13,29)" :key="i" :value="i" >{{ i }}</option>
-        </select>
-        <br />
-        <br />
-        Range for selected feature must be between {{ min }} and {{ max }}
-        <br />
-        <br />
-        <div>
-          Select Minimum Value of Range
-          <input type="number" v-model="temp2"  />
-        </div>
-        <br />
-        <div>
-          Select Maximum Value of Range
-          <input type="number" v-model="temp3" />
-        </div>
-        <div class="modal-header">
-            <h2>{{ info }}</h2>
-            <h2>{{ i2 }}</h2>
-        </div>
-        <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
-      </div>
-
-      <div v-if="temp0==='Face Measurements'" >
-        Select a Feature:
-        <select v-model="temp1" required>
-          <option disabled value="">Select Feature</option>
-          <option v-for="i in feats.slice(56,68)" :key="i" :value="i" >{{ i }}</option>
-        </select>
-        <br />
-        <br />
-        Range for selected feature must be between {{ min }} and {{ max }}
-        <br />
-        <br />
-        <div>
-          Select Minimum Value of Range
-          <input type="number" v-model="temp2"  />
-        </div>
-        <br />
-        <div>
-          Select Maximum Value of Range
-          <input type="number" v-model="temp3" />
-        </div>
-        <div class="modal-header">
-            <h2>{{ info }}</h2>
-            <h2>{{ i2 }}</h2>
-        </div>
-        <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
-      </div>
 
     </div>
   </div>
@@ -360,14 +349,20 @@ right: 0;
 bottom: 0;
 z-index: 98;
 background-color: #32323277;
+height: 75em;
+}
+fieldset {
+  border-width: 0px;
+  font-size: 20px;
+  margin-top: 16px;
 }
 .modal {
 box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
-border-radius: 25px; 
+border-radius: 5px; 
 background-color: @tan;
 margin: auto;
-height: 50%;
-margin-top: 20%;
+width: 300px;
+margin-top: 5%;
 position: relative;
 overflow-y: auto;
 color: #fff;
@@ -400,4 +395,3 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 </style>
-cl
