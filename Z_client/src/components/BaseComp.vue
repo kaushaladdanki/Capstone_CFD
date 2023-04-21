@@ -269,14 +269,33 @@ export default class BaseComp extends Vue {
 
   // This function will be called when the user submits a number using the sample modal form
   // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
-  genSamp(s: number){
-    // s is the sample size recieved from the sample modal form
-    // samp is the name of the array of strings that is displayed once this function exicutes
+  genSamp(sampleSize: number) {
+    console.log("Generating Sample");
+    let clusters = this.genClusters(0);
+    if (sampleSize <= 0 || clusters.length == 0) return [];
+    let minSize = clusters[0].length;
+    clusters.forEach(el => {
+        if (el.length < minSize) minSize = el.length;
+    });
+    let maxSampleSize: number = minSize * clusters.length;
+    if (sampleSize > maxSampleSize) {
+        return [];
+    }
+    let shuffled = clusters.sort(() => 0.5 - Math.random());
 
-    this.test = s;
-    this.samp = ["the faces","of the sample"];
+    // Get first sampleSize % clusters.length elements
+    let baseCount = Math.floor(sampleSize / clusters.length);
+    let extraCount = sampleSize % clusters.length;
+    let base: Array<string> = []
+    shuffled.forEach((el, ind) => {
+        base = base.concat(el.sort(() => 0.5 - Math.random()).splice(0, baseCount + (ind < extraCount ? 1 : 0)));
+    });
 
+    this.samp = base;
     this.displaySample = !this.displaySample;
+
+    return base;
+
   }
 
   // returns a 2d array [[face, face], [face,face], ...] 
