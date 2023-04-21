@@ -4,11 +4,6 @@
       <div class="modal">
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <div class="modal-header">
-<<<<<<< HEAD
-            <h2>Generate Sample</h2>
-            <SampleForm />
-        </div> 
-=======
           <h2>Generate Sample</h2>
           <form>
             <label for="sample-size-picker">Sample Size: </label>
@@ -19,17 +14,13 @@
             
           </form>
         </div>
->>>>>>> main
       </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-<<<<<<< HEAD
 import SampleForm from './SampleForm.vue';
-=======
->>>>>>> main
 
 @Options({
   components: {
