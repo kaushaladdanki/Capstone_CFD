@@ -4,16 +4,32 @@
       <div class="modal">
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <div class="modal-header">
+<<<<<<< HEAD
             <h2>Generate Sample</h2>
             <SampleForm />
         </div> 
+=======
+          <h2>Generate Sample</h2>
+          <form>
+            <label for="sample-size-picker">Sample Size: </label>
+            <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+            <button class="submit" :disabled="!validSampleSize" @click.prevent="genSample()">Submit</button>
+            <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+            <button type="button" @click.prevent="tester()">{{ test }}</button>
+            
+          </form>
+        </div>
+>>>>>>> main
       </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
+<<<<<<< HEAD
 import SampleForm from './SampleForm.vue';
+=======
+>>>>>>> main
 
 @Options({
   components: {
@@ -21,7 +37,23 @@ import SampleForm from './SampleForm.vue';
   }
 })
 export default class Sample extends Vue {
-    closeThis(){
+  sampleSize = 5;
+  dbSize = 30;
+  test = 5
+
+  tester(){
+    this.test = Math.floor(Math.random() * 100)
+  }
+
+  get validSampleSize() {
+      return (this.sampleSize > 0 && this.sampleSize < this.dbSize-1);
+  }
+  genSample(){
+      this.$emit("genSample", this.sampleSize);
+      this.closeThis();
+  }  
+  
+  closeThis(){
         this.$emit("closeModalSample");
     }
 
@@ -79,5 +111,8 @@ export default class Sample extends Vue {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+#sample-size-error-message {
+    color: red;
 }
 </style>

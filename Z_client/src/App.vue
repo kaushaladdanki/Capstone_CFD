@@ -1,6 +1,6 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <BaseComp/>
+  <!--- <img alt="Vue logo" src="./assets/logo.png"> -->
+  <BaseComp />
 </template>
 
 <script lang="ts">
@@ -16,12 +16,32 @@ export default class App extends Vue {}
 </script>
 
 <style>
+  
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
+
+<!--
+  
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  width: 100vw;
+  background-color: #222;
+  padding: 15px;
+}
+
+body {
+  font-family: 'monsterrat', sans-serif;
+}
+
+-->
