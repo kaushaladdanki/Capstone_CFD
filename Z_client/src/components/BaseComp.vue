@@ -36,7 +36,7 @@
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
       </section>
-
+      <br />
       <aside role="complementary" aria-label="Filter">
         <h2>Filter</h2>
         <p>Follow these instructiosn to add a filter to the dataset.</p>
@@ -917,24 +917,21 @@ export default class BaseComp extends Vue {
 .brown{fill: @brown}
 .bigHead{
   background-color: @brown;
-  top: 0
-  ;
+  top: 0;
 }
-th{
-  padding: 2.5px
-}
+//th{  padding: 2.5px}
 
 h1 {
   text-align: center;
   font-size: 2.3rem;
   color: #ffffff;
-  flex: 2;
-  padding-top: 10px;
+  //flex: 2;
+  //padding-top: 10px;
 }
 
 h2 {
   font-size: 1.7rem;
-  flex: 3;
+  //flex: 3;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -965,24 +962,22 @@ body {
 header {
   margin-bottom: 10px;
   display: flex;
+  flex-wrap: wrap;
 }
 
 //for text logo
-header img {
-  flex: 1;
-}
+header img {  max-height: 259px; max-width: 508px; height: auto; width: auto;}
 
 main {
-  flex: 5;
+  //flex: 5;
   display: flex;
+  justify-content: space-evenly;
 }
 
-article, section {
-  flex: 1;
-}
+article, section {  flex: 3;}
 
 aside {
-  flex: 1;
+  flex: 3;
   margin-left: 10px;
   padding: 1%;
   border-left-style: solid;
@@ -995,9 +990,8 @@ footer {
 }
 
 .flex-container {
-  padding: 1%;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
 }
 
 .headerDiv {
@@ -1007,6 +1001,8 @@ footer {
   text-align: center;
   padding-left: 10px;
   padding-right: 20px;
+  max-height: 259px;
+  overflow: auto;
 }
 
 </style>
