@@ -19,21 +19,22 @@
     <main role="main">
 
       <section role="region" aria-label="Sample">
-        <h2 value="Sample"></h2>
-        <h3>Number of Faces in Current Database = {{ dbSize }}</h3>
+        <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
-        <button @click="toggleModalSample()" style="height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
-        <!-- Display of generated sample 
         <br />
         <br />
-        Number of Faces in Current Database = {{ dbSize }}
+        <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
+        <!-- Display of generated sample  -->
+        <br />
+        <br />
+        Test2 = {{ test2 }}
         <br />
         <br />
         Test output: {{ test }}
         <br />
         <br />
-        Test output array: {{ test2dA }}-->
+        Test output array: {{ test2dA }}
         <br />
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
@@ -196,7 +197,8 @@ export default class BaseComp extends Vue {
   max: -11,
   min: -11,
   exclude: "defEx",
-  info: ""
+  info: "",
+  cluster: -1
   }
 
   bigFO = {
@@ -205,7 +207,8 @@ export default class BaseComp extends Vue {
   max: -11,
   min: -11,
   exclude: "defEx",
-  info: ""
+  info: "",
+  cluster: -1
   }
   
   bigList = [this.bigFO];
@@ -218,63 +221,22 @@ export default class BaseComp extends Vue {
   dbSize = 0;
   samp = [""];
   test = 0;
-  test2 = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
+  test2 = [-3];
   test3 = [""];
   test2dA = [[""]];
+  // Variables handling filter lists display and contents
   hasGender = false;
   hasRace = false;
   hasAge = false;
   hasClass = false;
   hasAtt = false;
   hasMeas = false;
-  genList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
-  raceList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
-  ageList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
-  classList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
-  attList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
-  measList = [{
-      feature: "defFeat",
-      category: 'defCat',
-      max: -11,
-      min: -11,
-      exclude: "defEx",
-      info: ""}];
+  genList = [this.tempFO];
+  raceList = [this.tempFO];
+  ageList = [this.tempFO];
+  classList = [this.tempFO];
+  attList = [this.tempFO];
+  measList = [this.tempFO];
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
@@ -313,7 +275,7 @@ export default class BaseComp extends Vue {
   // This will add the filter to the list and remove the feature from the features list.
   // apply filter to the database and dsiplay current # of faces present in database with filters applied.
   addNewFilter(){
-    var temp = [""]
+    var temp = [""];
     if(!this.usedFeats.includes(this.bigFO.feature)){
       this.usedFeats.push(this.bigFO.feature);
       this.bigList.push(this.bigFO);
@@ -350,10 +312,6 @@ export default class BaseComp extends Vue {
   updateFilter(){
     this.dbFaces = this.faces;
     // clear out the typed filter lists
-    var empTemp = [this.tempFO];
-    empTemp.shift();
-    this.test3 = [""];
-    this.test3.shift();
     this.hasGender = false;
     this.hasRace = false;
     this.hasAge = false;
@@ -472,41 +430,6 @@ export default class BaseComp extends Vue {
     }
     this.dbSize = this.dbFaces.length;
   }
-
-  updateBools(){
-    if (this.genList.length >= 2){
-      this.hasGender = true;
-    } else {
-      this.hasGender = false;
-    }
-    if (this.raceList.length >= 2){
-      this.hasRace = true;
-    } else {
-      this.hasRace = false;
-    }
-    if (this.ageList.length >= 2){
-      this.hasAge = true;
-    } else {
-      this.hasAge = false;
-    }
-    if (this.classList.length >= 2){
-      this.hasClass = true;
-    } else {
-      this.hasClass = false;
-    }
-    if (this.attList.length >= 2){
-      this.hasAtt = true;
-    } else {
-      this.hasAtt = false;
-    }
-    if (this.measList.length >= 2){
-      this.hasMeas = true;
-    } else {
-      this.hasMeas = false;
-    }
-
-  }
-
   // This function will be called when the user submits a number using the sample modal form
   // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
   genSamp(s: number){
@@ -563,9 +486,58 @@ export default class BaseComp extends Vue {
   // returns a 2d array [[face, face], [face,face], ...] 
   // This array can be indexed as clusters[faceclusters][faces]
   genClusters(s:number, tag:string){ 
-    // for testing purposes, clusters has 5 clusters of 1-5 faces
     var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    switch (tag){
+      case "t":
+        clusters = this.attClusters(s);
+        break;
+      case "m":
+        clusters = this.measClusters(s);
+        break;
+    }
+
+    // for testing purposes, clusters has 5 clusters of 1-5 faces
     return clusters
+  }
+
+  attClusters(s:number) {
+    var attClust = [[""]];
+    //dbFaces.slice(13,29)
+
+    // select k random points to be initial centroids
+    var centInd1 = Math.floor(Math.random() * this.dbSize);
+    var indexArr = [0];
+    indexArr.shift();
+    while(indexArr.length < s){
+      var r = Math.floor(Math.random() * this.dbSize);
+      if(indexArr.indexOf(r) === -1) indexArr.push(r);
+    }
+
+    var centroids = [[""]];
+    centroids.shift();
+    for(var i in indexArr){
+      var ind = indexArr[i];
+      centroids.push(this.dbFaces[ind]);
+    }
+
+    // measure all points to centroids and assign clusters
+
+    // remeasure new clusters and repeat until centroids stop changing position.
+
+    // return string of clusters
+    return attClust;
+  }
+
+  getDistanceAtt(face1: [""], face2: [""]){
+    var i = 2;
+    return i;
+  }
+
+  measClusters(s:number) {
+    var measClust = [[""]];
+
+
+    return measClust;
   }
 
   testCSV = `Target,Race,Gender,Age,NumberofRaters,Female_prop,Male_prop,Asian_prop,Black_prop,Latino_prop,Multi_prop,Other_prop,White_prop,Afraid,Angry,Attractive,Babyface,Disgusted,Dominant,Feminine,Happy,Masculine,Prototypic,Sad,Suitability,Surprised,Threatening,Trustworthy,Unusual,Luminance_median,Nose_Width,Nose_Length,Lip_Thickness,Face_Length,R_Eye_H,L_Eye_H,Avg_Eye_Height,R_Eye_W,L_Eye_W,Avg_Eye_Width,Face_Width_Cheeks,Face_Width_Mouth,Forehead,Pupil_Top_R,Pupil_Top_L,Asymmetry_pupil_top,Pupil_Lip_R,Pupil_Lip_L,Asymmetry_pupil_lip,BottomLip_Chin,Midcheek_Chin_R,Midcheek_Chin_L,Cheeks_avg,Midbrow_Hairline_R,Midbrow_Hairline_L,Faceshape,Heartshapeness,Noseshape,LipFullness,EyeShape,EyeSize,UpperHeadLength,MidfaceLength,ChinLength,ForeheadHeight,CheekboneHeight,CheekboneProminence,FaceRoundness,fWHR
@@ -1255,6 +1227,10 @@ aside {
 
 p {
   text-align: left;
+}
+
+.filter p {
+  text-align: center;
 }
 
 footer {

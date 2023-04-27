@@ -176,7 +176,8 @@ filterObject = {
   max: -1,
   min: -1,
   exclude: "White",
-  info: ""
+  info: "",
+  cluster: -1
 }
 
 selectFeat(t: string){
@@ -221,7 +222,6 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Asian":
-      this.closeThis();
       this.filterObject.info = "Asian faces will be removed";
       this.filterObject.feature = "Asian";
       this.filterObject.category = "r";
