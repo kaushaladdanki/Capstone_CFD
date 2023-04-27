@@ -4,17 +4,17 @@
     <div class="modal" >
       <button class="close-button" type="button" @click.prevent="closeThis">X</button>
       <fieldset>
-        <Legend>Create A Filter</legend>
+        <legend>Create A Filter</legend>
         <br />
         <label for="selFeat">Select Feature type:</label>
-        <select id="selFeat" v-model="temp0">
+        <select id="selFeat" v-model="featureType">
           <option disabled value="">Select Feature Type</option>
           <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
         </select>
         <br />
         
         <!-- could potentially base string bassed to feat off of string used in a v-for from a list displayed with {{ like above }}-->
-        <div v-if="temp0==='Race'" >
+        <div v-if="featureType==='Race'" >
           <br />
           <br />
           <label>Select feature to be removed from dataset.</label>
@@ -35,7 +35,7 @@
           <button type="button" @click.prevent="selectFeat('Other')">Other</button>
         </div>
 
-        <div v-if="temp0==='Gender'" >
+        <div v-if="featureType==='Gender'" >
           <br />
           <br />
           <label>Select feature to be removed from dataset.</label>
@@ -47,17 +47,17 @@
           <button type="button" @click.prevent="selectFeat('Female')">Female</button>
         </div>
 
-        <div v-if="temp0==='Age'">
+        <div v-if="featureType==='Age'">
           <br />
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
             <label for="aMin">Select Minimum Value of Range</label>
-            <input id="aMin" type="number" v-model="temp2"/>
+            <input id="aMin" type="number" v-model="featureMin"/>
           </div>
           <br />
           <div>
             <label for="aMax">Select Maximum Value of Range</label>
-            <input id="aMax" type="number" v-model="temp3" />
+            <input id="aMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
               <p>{{ info }}</p>
@@ -66,9 +66,9 @@
           <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
         </div>
 
-        <div v-if="temp0==='Race Prop'" >
-          <label for="pType">Select a prop:</label>
-          <select id="pType" v-model="temp1">
+        <div v-if="featureType==='User Class Data'" >
+          <label for="pType">Select a Feature:</label>
+          <select id="pType" v-model="featureString">
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
           </select>
@@ -77,12 +77,12 @@
           <br />
           <div>
             <label for="pMin">Select Minimum Value of Range</label>
-            <input id="pmin" type="number" v-model="temp2"  />
+            <input id="pmin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
             <label for="pMax">Select Maximum Value of Range</label>
-            <input id="pMax" type="number" v-model="temp3" />
+            <input id="pMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
               <p>{{info }}</p>
@@ -91,9 +91,9 @@
           <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
         </div>
 
-        <div v-if="temp0==='Attributes'" >
+        <div v-if="featureType==='Attributes'" >
           <label for="atFeat">Select a Feature:</label>
-          <select id="atFeat" v-model="temp1" required>
+          <select id="atFeat" v-model="featureString" required>
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(13,29)" :key="i" :value="i" >{{ i }}</option>
           </select>
@@ -101,12 +101,12 @@
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
             <label for="atMin">Select Minimum Value of Range</label>
-            <input id="atMin" type="number" v-model="temp2"  />
+            <input id="atMin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
             <label for="atMax">Select Maximum Value of Range</label>
-            <input id="atMax" type="number" v-model="temp3" />
+            <input id="atMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
               <p>{{ info }}</p>
@@ -115,9 +115,9 @@
           <button class="submit" @click="createFilter" :disabled="invalidRange">Add Filter</button>
         </div>
 
-        <div v-if="temp0==='Face Measurements'" >
+        <div v-if="featureType==='Face Measurements'" >
           <label for="fmFeat">Select a Feature:</label>
-          <select id="fmFeat" v-model="temp1" required>
+          <select id="fmFeat" v-model="featureString" required>
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(56,68)" :key="i" :value="i" >{{ i }}</option>
           </select>
@@ -125,12 +125,12 @@
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
             <label for="fmMin">Select Minimum Value of Range</label>
-            <input id="fmMin" type="number" v-model="temp2"  />
+            <input id="fmMin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
             <label for="fmMax">Select Maximum Value of Range</label>
-            <input id="fmMax" type="number" v-model="temp3" />
+            <input id="fmMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
               <p>{{ info }}</p>
@@ -160,16 +160,15 @@ props: {
 })
 
 export default class AddFilter extends Vue {
-
-temp0 = ""
-temp1 = "_____"
-temp2 = 0
-temp3 = 1
+featureType = ""
+featureString = "_____"
+featureMin = 0
+featureMax = 1
 i2 = ""
 min = 0
 max = 1
 invalidRange = false;
-types = ["Race","Gender","Age","Race Prop","Attributes","Face Measurements"]
+types = ["Race","Gender","Age","User Class Data","Attributes","Face Measurements"]
 info = ""
 filterObject = {
   feature: "Age",
@@ -186,7 +185,7 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Male":
-      this.filterObject.info = "Male faces will be removed"
+      this.filterObject.info = "Male faces will be removed";
       this.filterObject.feature = "Gender";
       this.filterObject.category = "g";
       this.filterObject.exclude = "M";
@@ -195,7 +194,7 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "Female":
-      this.filterObject.info = "Female faces will be removed"
+      this.filterObject.info = "Female faces will be removed";
       this.filterObject.feature = "Gender";
       this.filterObject.category = "g";
       this.filterObject.exclude = "F";
@@ -204,7 +203,7 @@ selectFeat(t: string){
       this.closeThis();
       break;
     case "White":
-      this.filterObject.info = "White faces will be removed"
+      this.filterObject.info = "White faces will be removed";
       this.filterObject.feature = "White";
       this.filterObject.category = "r";
       this.filterObject.exclude = "W";
@@ -264,7 +263,7 @@ updateType(t: string){
       this.min = 0;
       this.max = 6;
       break;
-    case "Race Prop":
+    case "User Class Data":
       this.min = 0;
       this.max = 100;
       break;
@@ -285,10 +284,26 @@ createFilter(){
     this.closeThis();
   }
   else{
-    this.filterObject.feature = this.temp1;
+    this.filterObject.feature = this.featureString;
     this.filterObject.info = this.info;
-    this.filterObject.max = this.temp3;
-    this.filterObject.min = this.temp2;
+    this.filterObject.max = this.featureMax;
+    this.filterObject.min = this.featureMin;
+    switch (this.featureType) {
+      default:
+        break;
+      case "Age":
+        this.filterObject.category = 'a';
+        break;
+      case "Attributes":
+        this.filterObject.category = 't';
+        break;
+      case "User Class Data":
+        this.filterObject.category = 'c';
+        break;
+      case "Face Measurements":
+        this.filterObject.category = 'm';
+        break;
+    }
     this.$emit("update:filterObject", this.filterObject);
     this.$emit("createNewFilter");
     this.closeThis();
@@ -296,17 +311,17 @@ createFilter(){
 }
 
 checkValidity(){
-  if (this.temp2 > this.max){
-    this.temp2 = this.min;
-  } else if (this.temp2 < this.min) {
-    this.temp2 = this.min;
+  if (this.featureMin > this.max){
+    this.featureMin = this.min;
+  } else if (this.featureMin < this.min) {
+    this.featureMin = this.min;
   }
-  if (this.temp3 < this.min) {
-    this.temp3 = this.max;
-  } else if (this.temp3 > this.max){
-    this.temp3 = this.max;
+  if (this.featureMax < this.min) {
+    this.featureMax = this.max;
+  } else if (this.featureMax > this.max){
+    this.featureMax = this.max;
   }
-  if (this.temp2 >= this.temp3) {
+  if (this.featureMin >= this.featureMax) {
     this.invalidRange = true;
     this.i2 = "Warning: The selected range is invalid.";
   }
@@ -314,14 +329,14 @@ checkValidity(){
     this.invalidRange = false;
     this.i2 = "";
   }
-  if (this.temp0==="Age"){
-    this.temp1 = "Age"
+  if (this.featureType==="Age"){
+    this.featureString = "Age"
   }
-  if (this.temp1 === "_____"){
+  if (this.featureString === "_____"){
     this.invalidRange = true;
     this.i2 = "You must select a feature to create a filter."
   }
-  this.info = this.temp1 + " is between " + this.temp2 + " and " + this.temp3;
+  this.info = this.featureString + " is between " + this.featureMin + " and " + this.featureMax;
 }
 
 }
