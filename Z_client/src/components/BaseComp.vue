@@ -41,7 +41,7 @@
       <br />
       <aside role="complementary" aria-label="Filter">
         <h2>Filter</h2>
-        <p>Specify what faces will be present in the database by applying filters. Each face has over 50 features that can be used to determine the types of faces the sample generater will draw from. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
+        <p>Specify what faces will be present in the database by applying filters. Each face has over 50 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
@@ -334,6 +334,12 @@ export default class BaseComp extends Vue {
     this.attList = empTemp;
     this.classList = empTemp;
     this.measList = empTemp;
+    this.hasGender = false;
+    this.hasRace = false;
+    this.hasAge = false;
+    this.hasAtt = false;
+    this.hasClass = false;
+    this.hasMeas = false;
 
     // read through each filter in bigList
     for(var i in this.bigList){
@@ -350,6 +356,7 @@ export default class BaseComp extends Vue {
           tempFaces.shift();
           this.dbFaces = tempFaces;
           this.genList.push(this.bigList[i])
+          this.hasGender = true;
           break;
         // handles Race filters
         case "r":
@@ -362,6 +369,7 @@ export default class BaseComp extends Vue {
           tempF2.shift();
           this.dbFaces = tempF2;
           this.raceList.push(this.bigList[i]);
+          this.hasRace = true;
           break;
         // handles other, numerical filters
         case "a":
@@ -377,7 +385,8 @@ export default class BaseComp extends Vue {
           }
           tempF3.shift();
           this.dbFaces = tempF3;
-          this.ageList.push(this.bigList[i])
+          this.ageList.push(this.bigList[i]);
+          this.hasAge = true;
           break;
         case "m":
           //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
@@ -392,7 +401,8 @@ export default class BaseComp extends Vue {
           }
           tempF3m.shift();
           this.dbFaces = tempF3m;
-          this.measList.push(this.bigList[i])
+          this.measList.push(this.bigList[i]);
+          this.hasMeas = true;
           break;
         case "t":
           //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
@@ -407,7 +417,8 @@ export default class BaseComp extends Vue {
           }
           tempF3t.shift();
           this.dbFaces = tempF3t;
-          this.attList.push(this.bigList[i])
+          this.attList.push(this.bigList[i]);
+          this.hasAtt = true;
           break;
         case "c":
           //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
@@ -422,14 +433,14 @@ export default class BaseComp extends Vue {
           }
           tempF3c.shift();
           this.dbFaces = tempF3c;
-          this.classList.push(this.bigList[i])
+          this.classList.push(this.bigList[i]);
+          this.hasClass = true;
           break;
           
       }
       
     }
     this.dbSize = this.dbFaces.length;
-    this.updateBools();
   }
 
   updateBools(){
@@ -521,7 +532,7 @@ export default class BaseComp extends Vue {
 
   // returns a 2d array [[face, face], [face,face], ...] 
   // This array can be indexed as clusters[faceclusters][faces]
-  genClusters(s:number){ 
+  genClusters(s:number, tag:string){ 
     // for testing purposes, clusters has 5 clusters of 1-5 faces
     var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
     return clusters
