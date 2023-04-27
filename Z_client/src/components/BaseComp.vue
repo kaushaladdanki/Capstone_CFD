@@ -105,35 +105,6 @@
           </div>
         </div>
         <br />
-        <br />
-        hasAtt: {{ hasAtt }}
-        <br />
-        <br />
-        attList: {{ attList}}
-        <br />
-        <br />
-        hasGender: {{ hasGender }}
-        <br />
-        <br />
-        genList: {{ genList}}
-        <br />
-        <br />
-        hasAge: {{ hasAge }}
-        <br />
-        <br />
-        ageList: {{ ageList}}
-        <br />
-        <br />
-        ageList len: {{ ageList.length }}
-        <br />
-        <br />
-        hasRace: {{ hasRace}}
-        <br />
-        <br />
-        raceList: {{ raceList }}
-        <br />
-        <br />
-        raceList len: {{ raceList.length }}
         <!--
         <div class="filter" v-for="f in bigList" :key="f.info">
           <p class="filter-text">
@@ -218,7 +189,16 @@ export default class BaseComp extends Vue {
   showModalSample = false;
   displaySample = false;
 
-  // This is a filter object
+  // Template for filter object recieved from the AddFilter component
+  tempFO = {
+  feature: "defFeat",
+  category: 'defCat',
+  max: -11,
+  min: -11,
+  exclude: "defEx",
+  info: ""
+  }
+
   bigFO = {
   feature: "defFeat",
   category: 'defCat',
@@ -238,6 +218,14 @@ export default class BaseComp extends Vue {
   dbSize = 0;
   samp = [""];
   test = 0;
+  test2 = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  test3 = [""];
   test2dA = [[""]];
   hasGender = false;
   hasRace = false;
@@ -245,12 +233,48 @@ export default class BaseComp extends Vue {
   hasClass = false;
   hasAtt = false;
   hasMeas = false;
-  genList = [this.bigFO];
-  raceList = [this.bigFO];
-  ageList = [this.bigFO];
-  classList = [this.bigFO];
-  attList = [this.bigFO];
-  measList = [this.bigFO];
+  genList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  raceList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  ageList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  classList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  attList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
+  measList = [{
+      feature: "defFeat",
+      category: 'defCat',
+      max: -11,
+      min: -11,
+      exclude: "defEx",
+      info: ""}];
 
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
@@ -326,20 +350,28 @@ export default class BaseComp extends Vue {
   updateFilter(){
     this.dbFaces = this.faces;
     // clear out the typed filter lists
-    var empTemp = [this.bigFO];
+    var empTemp = [this.tempFO];
     empTemp.shift();
-    this.genList =  empTemp;
-    this.raceList = empTemp;
-    this.ageList = empTemp;
-    this.attList = empTemp;
-    this.classList = empTemp;
-    this.measList = empTemp;
+    this.test3 = [""];
+    this.test3.shift();
     this.hasGender = false;
     this.hasRace = false;
     this.hasAge = false;
     this.hasAtt = false;
     this.hasClass = false;
     this.hasMeas = false;
+    this.genList = [this.tempFO];
+    this.genList.shift();
+    this.measList = [this.tempFO];
+    this.measList.shift();
+    this.raceList = [this.tempFO];
+    this.raceList.shift();
+    this.ageList = [this.tempFO];
+    this.ageList.shift();
+    this.attList = [this.tempFO];
+    this.attList.shift();
+    this.classList = [this.tempFO];
+    this.classList.shift();
 
     // read through each filter in bigList
     for(var i in this.bigList){
@@ -350,12 +382,12 @@ export default class BaseComp extends Vue {
           var tempFeat = this.bigList[i].exclude;
           for(var j in this.dbFaces){
             if(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)] !== this.bigList[i].exclude){
-              tempFaces.push(this.dbFaces[j])
+              tempFaces.push(this.dbFaces[j]);
             }
           }
           tempFaces.shift();
           this.dbFaces = tempFaces;
-          this.genList.push(this.bigList[i])
+          this.genList.push(this.bigList[i]);
           this.hasGender = true;
           break;
         // handles Race filters
@@ -363,7 +395,7 @@ export default class BaseComp extends Vue {
           var tempF2 = [[""]];
           for(var k in this.dbFaces){
             if(this.dbFaces[k][this.feats.indexOf("Race")] !== this.bigList[i].exclude){
-              tempF2.push(this.dbFaces[k])
+              tempF2.push(this.dbFaces[k]);
             }
           }
           tempF2.shift();
@@ -436,9 +468,7 @@ export default class BaseComp extends Vue {
           this.classList.push(this.bigList[i]);
           this.hasClass = true;
           break;
-          
       }
-      
     }
     this.dbSize = this.dbFaces.length;
   }
@@ -1221,6 +1251,10 @@ aside {
   border-left-color: #222249;
   min-height: 600px;
   margin-bottom: 40px;
+}
+
+p {
+  text-align: left;
 }
 
 footer {

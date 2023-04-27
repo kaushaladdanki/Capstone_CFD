@@ -51,12 +51,12 @@
           <br />
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
-            <label for="aMin">Select Minimum Value of Range</label>
+            <label for="aMin">Select Minimum Value of Range </label>
             <input id="aMin" type="number" v-model="featureMin"/>
           </div>
           <br />
           <div>
-            <label for="aMax">Select Maximum Value of Range</label>
+            <label for="aMax">Select Maximum Value of Range </label>
             <input id="aMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
@@ -76,12 +76,12 @@
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <br />
           <div>
-            <label for="pMin">Select Minimum Value of Range</label>
+            <label for="pMin">Select Minimum Percentage </label>
             <input id="pmin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
-            <label for="pMax">Select Maximum Value of Range</label>
+            <label for="pMax">Select Maximum Percentage </label>
             <input id="pMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
@@ -100,12 +100,12 @@
           <br />
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
-            <label for="atMin">Select Minimum Value of Range</label>
+            <label for="atMin">Select Minimum Value of Range </label>
             <input id="atMin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
-            <label for="atMax">Select Maximum Value of Range</label>
+            <label for="atMax">Select Maximum Value of Range </label>
             <input id="atMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
@@ -124,12 +124,12 @@
           <br />
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <div>
-            <label for="fmMin">Select Minimum Value of Range</label>
+            <label for="fmMin">Select Minimum Value of Range </label>
             <input id="fmMin" type="number" v-model="featureMin"  />
           </div>
           <br />
           <div>
-            <label for="fmMax">Select Maximum Value of Range</label>
+            <label for="fmMax">Select Maximum Value of Range </label>
             <input id="fmMax" type="number" v-model="featureMax" />
           </div>
           <div class="modal-header">
@@ -256,8 +256,8 @@ updateType(t: string){
     default:
       break;
     case "Age":
-      this.min = 20;
-      this.max = 80;
+      this.min = 10;
+      this.max = 90;
       break;
     case "Attributes":
       this.min = 0;
@@ -298,7 +298,9 @@ createFilter(){
         this.filterObject.category = 't';
         break;
       case "User Class Data":
-        this.filterObject.category = 'c';
+        this.filterObject.category = 'c';        
+        this.filterObject.max = this.featureMax/100;
+        this.filterObject.min = this.featureMin/100;
         break;
       case "Face Measurements":
         this.filterObject.category = 'm';
