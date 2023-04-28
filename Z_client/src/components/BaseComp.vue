@@ -55,7 +55,7 @@
       <br />
       <aside role="complementary" aria-label="Filter">
         <h2>Face Feature Filter</h2>
-        <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
+        <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at <a href="https://www.chicagofaces.org/">chicagofaces.org</a></p>
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
