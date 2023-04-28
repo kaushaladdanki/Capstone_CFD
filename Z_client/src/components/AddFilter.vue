@@ -68,12 +68,13 @@
         </div>
 
         <div v-if="featureType==='User Class Data'" >
+          <br />
           <label for="pType">Select a Feature: </label>
+          <br />
           <select id="pType" v-model="featureString">
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
           </select>
-          <br />
           <p>Range for selected feature must be between {{ min }} and {{ max }}</p>
           <br />
           <div>
@@ -93,7 +94,9 @@
         </div>
 
         <div v-if="featureType==='Attributes'" >
+          <br />
           <label for="atFeat">Select a Feature:</label>
+          <br />
           <select id="atFeat" v-model="featureString" required>
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(13,29)" :key="i" :value="i" >{{ i }}</option>
@@ -117,7 +120,9 @@
         </div>
 
         <div v-if="featureType==='Face Measurements'" >
+          <br />
           <label for="fmFeat">Select a Feature:</label>
+          <br />
           <select id="fmFeat" v-model="featureString" required>
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(56,68)" :key="i" :value="i" >{{ i }}</option>
@@ -353,6 +358,10 @@ checkValidity(){
 @tan: #b8762a;
 @paleblue: #a1a9de;
 @brown: #a96149;
+legend{
+  font-size: 30px;
+  font-weight: bold;
+}
 header {
 width: 100vw;
 background-color: #222;

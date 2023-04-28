@@ -6,7 +6,7 @@
         <fieldset class="modal-header">
           <legend>Generate Sample</legend>
             <br />
-            <label for="sample-type">Sample Type</label>
+            <label for="sample-type">Sample Type: </label>
             <select id="selSamp" v-model="sType">
                 <option disabled value="">Select Feature Type</option>
                 <option v-for="s in stypes" :key="s" :value="s" @click.prevent="updateSize(dbSize)">{{ s }}</option>
@@ -108,6 +108,10 @@ export default class Sample extends Vue {
 @tan: #b8762a;
 @paleblue: #a1a9de;
 @brown: #a96149;
+legend{
+  font-size: 30px;
+  font-weight: bold;
+}
 header {
 width: 100vw;
 background-color: #222;
