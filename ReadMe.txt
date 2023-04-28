@@ -55,12 +55,12 @@ REMAINING STEPS OCCUR INSIDE NODE INSTANCE TERMINAL:
     SSLEngine on
     SSLCertificateFile "/opt/bitnami/apache/conf/bitnami/certs/server.crt"
     SSLCertificateKeyFile "/opt/bitnami/apache/conf/bitnami/certs/server.key"
-    DocumentRoot "/opt/bitnami/projects/myapp"
-    <Directory "/opt/bitnami/projects/myapp">
+    DocumentRoot "/home/bitnami/htdocs/Capstone_CFD/server"
+    <Directory "/home/bitnami/htdocs/Capstone_CFD/server">
       Require all granted
     </Directory>
-    ProxyPass / http://localhost:3000/
-    ProxyPassReverse / http://localhost:3000/
+    ProxyPass / http://localhost:8080/
+    ProxyPassReverse / http://localhost:8080/
   </VirtualHost>
   
   - Remember to type :x! to save and quit the text editor
