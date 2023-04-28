@@ -44,8 +44,8 @@ REMAINING STEPS OCCUR INSIDE NODE INSTANCE TERMINAL:
     ProxyPass / http://localhost:8080/
     ProxyPassReverse / http://localhost:8080/
   </VirtualHost>
-  - be mindful of indents
   
+  - be mindful of indentations
   - Press :x! to save and quit from editing the file
   
   repeat this process for the https file 'vi /opt/bitnami/apache/conf/vhosts/myapp-https-vhost.conf'
