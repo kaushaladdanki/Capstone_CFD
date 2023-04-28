@@ -18,6 +18,8 @@ Can run npm run dev in for nodemon to host local server on port 8000
 
 To host client and look at frontend: npm run dev in the terminal while in the client folder. This will host to port 8080
 
+
+
 To Host on AWS Lightsail:
 
 - Create an aws account: https://aws.amazon.com/
