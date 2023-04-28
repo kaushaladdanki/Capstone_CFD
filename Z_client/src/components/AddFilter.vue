@@ -32,7 +32,8 @@
           <button type="button" @click.prevent="selectFeat('White')">White</button>
           <br />
           <br />
-          <button type="button" @click.prevent="selectFeat('Other')">Other</button>
+          <!-- There are currently no faces categorized as Other
+          <button type="button" @click.prevent="selectFeat('Other')">Other</button> -->
         </div>
 
         <div v-if="featureType==='Gender'" >
@@ -268,8 +269,8 @@ updateType(t: string){
       this.max = 100;
       break;
     case "Face Measurements":
-      this.min = 80;
-      this.max = 350;
+      this.min = 0;
+      this.max = 450;
       break;
   }
 }

@@ -22,11 +22,14 @@
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
-        @genSampleL="genSampL" @genSampleR="genSampR" @setSampType="setSampType" />
+        @genSampleS="genSampS" @genSampleR="genSampR" @setSampType="setSampType" />
         <br />
         <br />
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
         <!-- Display of generated sample 
+        <br />
+        <br />
+        <b v-if="sampError" style="text-align: center;">{{ sampEm }}</b>
         <br />
         <br />
         Test2 = {{ test2 }}
@@ -38,7 +41,10 @@
         Test3: {{ test3 }}
         <br />
         <br />
-        Test output array: {{ test2dA }}-->
+        Test output array: {{ test2dA }}
+        <br />-->
+        <br />
+        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
         <br /> 
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
@@ -46,7 +52,7 @@
       <br />
       <aside role="complementary" aria-label="Filter">
         <h2>Face Feature Filter</h2>
-        <p>Specify what faces will be present in the database by applying filters. Each face has over 50 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
+        <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
@@ -180,6 +186,7 @@ import { Options, Vue } from 'vue-class-component';
 import AddFilter from './AddFilter.vue';
 import MachineLearning from './MachineLearning.vue';
 import Sample from './Sample.vue';
+import { TableHints } from 'sequelize';
 
 @Options({
   components: {
@@ -226,10 +233,12 @@ export default class BaseComp extends Vue {
   usedFeats = [""];
   dbSize = 597;
   samp = [""];
+  sampError = false;
+  sampEm = "";
   test = 0;
   test2 = [-3];
   test3 = [""];
-  test2dA = [[""]];
+  test2dA = [{face:[""], cluster:-1}];
   // Variables handling filter lists display and contents
   hasGender = false;
   hasRace = false;
@@ -277,11 +286,15 @@ export default class BaseComp extends Vue {
   }
 
   toggleModalML() {
-    this.showModalML = !this.showModalML
+    this.showModalML = !this.showModalML;
   }
 
   toggleModalSample() {
-    this.showModalSample = !this.showModalSample
+    this.showModalSample = !this.showModalSample;
+  }
+  
+  toggleDisp() {
+    this.displaySample = !this.displaySample;
   }
 
   // This will add the filter to the list and remove the feature from the features list.
@@ -452,20 +465,27 @@ export default class BaseComp extends Vue {
 
   // This function will be called when the user submits a number using the sample modal form
   // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
-  genSampL(s: number){
+  genSampS(s: number){
     // s is the sample size recieved from the sample modal form
     // samp is the name of the array of strings that is displayed once this function exicutes
     var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
-    
+    this.test3.push(this.sampType);
     switch (this.sampType){
-      case "Attribut":
+      default:
+        this.sampEm = "Stratified samples require a feature type to be specified to culster on."
+        this.sampError = true;
+        break;
+      case "Attributes":
+        this.sampError = false;
         clusters = this.attClusters(s);
         break;
       case "Face Measurements":
-        clusters = this.measClusters(s);
+        this.sampError = false;
+        //clusters = this.measClusters(s);
         break;
-      case "UserClassData":
-        clusters = this.classClusters(s);
+      case "User Class Data":
+        this.sampError = false;
+        //clusters = this.classClusters(s);
         break;
     }
   }
@@ -475,16 +495,20 @@ export default class BaseComp extends Vue {
   genSampR(s: number){
     // s is the sample size recieved from the sample modal form
     // samp is the name of the array of strings that is displayed once this function exicutes
-
+    
+    this.sampError = false;
 
     this.test3.push("r")
-    this.test = s;
-    var tvar = 0;
+    var tvar = Math.floor(Math.random() * this.dbSize);
     var tsamp = [""]
-    var tbs = ["AF-209","AF-234","AF-210","AF-239","AF-211","AF-293","AF-423","AF-514","AF-269","AF-272","AF-277","AF-201","AF-223","AF-299","AF-342","AF-419"]
+    var tempFaces = this.dbFaces;
     while (tsamp.length < s + 1){
-      tsamp.push(this.dbFaces[tvar][0]);
-      tvar = Math.floor(Math.random() * this.dbSize);
+      var test = tempFaces[tvar][0];
+      if(!tsamp.includes(test)){
+        tsamp.push(test);
+        tempFaces.splice(tvar, 1);
+      }
+      tvar = Math.floor(Math.random() * tempFaces.length);
     }
     tsamp.shift();
     this.samp = tsamp;
@@ -534,6 +558,8 @@ export default class BaseComp extends Vue {
     return clusters
   }
 
+
+  // perhapse set limit on samples sizes to samples of 20 or something if takes to long to measure
   attClusters(k:number) {
     var attClust = [[""]];
     //dbFaces.slice(13,29)
@@ -547,14 +573,53 @@ export default class BaseComp extends Vue {
       if(indexArr.indexOf(r) === -1) indexArr.push(r);
     }
 
-    var centroids = [[""]];
-    centroids.shift();
-    for(var i in indexArr){
-      var ind = indexArr[i];
-      centroids.push(this.dbFaces[ind]);
+    var ttvar = Math.floor(Math.random() * this.dbSize);
+    var tcentroids = [{face:[""], cluster:-1}];
+    var ttempFaces = this.dbFaces;
+    var troid = 0;
+    while (tcentroids.length < k + 1){
+      var test = ttempFaces[ttvar];
+      var tempT = {face: test, cluster: troid}
+      if(!tcentroids.includes(tempT)){
+        tcentroids.push(tempT);
+        ttempFaces.splice(ttvar, 1);
+        troid = troid + 1;
+      }
+      ttvar = Math.floor(Math.random() * ttempFaces.length);
     }
+    tcentroids.shift();
 
     // measure all points to centroids and assign clusters
+
+    var tface1 = this.dbFaces[0];
+    var tface2 = this.dbFaces[1];
+    var tfaces = [{face:[""], cluster:-1}];
+    tfaces.shift();
+    var count = 0;
+
+    for(var tf in this.dbFaces){
+      tfaces.push({face:this.dbFaces[tf], cluster:-1});
+      var tMinDist = Number.MAX_VALUE;
+      for(var tc in tcentroids){
+        var tdTest = 0;
+        tface1 = tfaces[count].face;
+        tface2 = tcentroids[tc].face;
+        tdTest = this.getDistanceAtt(tface1, tface2);
+        if(tdTest < tMinDist){
+          tMinDist = tdTest;
+          tfaces[count].cluster = tcentroids[tc].cluster;
+        }
+      }
+      count = count + 1;
+    }
+
+    this.test2dA = tfaces;
+    this.test = tfaces.length;
+    
+    
+
+    
+    var dist = this.getDistanceAtt(tface1, tface2);
 
     // remeasure new clusters and repeat until centroids stop changing position.
 
@@ -562,21 +627,66 @@ export default class BaseComp extends Vue {
     return attClust;
   }
 
-  getDistanceAtt(face1: [""], face2: [""]){
-    var i = 2;
-    return i;
+  getDistanceAtt(face1: string[], face2: string[]){
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has null values in the database
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+      }
+    }
+    return Math.sqrt(tsum);
   }
 
-  measClusters(s:number) {
+  measClusters(face1: string[], face2: string[]) {
     var measClust = [[""]];
-
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has null values in the database
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+        this.test2.push(i);
+        this.test2.push(t1);
+        this.test2.push(t2);
+        this.test2.push(tdiff);
+        this.test2.push(tsum);
+        this.test2.push(-100);
+      }
+    }
 
     return measClust;
   }
 
-  classClusters(s:number) {
+  classClusters(face1: string[], face2: string[]) {
     var classClust = [[""]];
-
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has null values in the database
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+        this.test2.push(i);
+        this.test2.push(t1);
+        this.test2.push(t2);
+        this.test2.push(tdiff);
+        this.test2.push(tsum);
+        this.test2.push(-100);
+      }
+    }
 
     return classClust;
   }
