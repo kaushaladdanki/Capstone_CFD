@@ -19,6 +19,8 @@
     <main role="main">
 
       <section role="region" aria-label="Sample">
+        <br />
+        <br />
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
@@ -26,7 +28,7 @@
         <br />
         <br />
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
-        <!-- Display of generated sample 
+        <!-- Display of generated sample
         <br />
         <br />
         <b v-if="sampError" style="text-align: center;">{{ sampEm }}</b>
@@ -42,7 +44,8 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br />-->
+        <br /> -->
+        <br />
         <br />
         <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
         <br /> 
@@ -295,6 +298,7 @@ export default class BaseComp extends Vue {
   
   toggleDisp() {
     this.displaySample = !this.displaySample;
+    //location.reload();
   }
 
   // This will add the filter to the list and remove the feature from the features list.
@@ -459,8 +463,6 @@ export default class BaseComp extends Vue {
 
   setSampType(t: string){
     this.sampType = t;
-    this.test3.shift();
-    this.test3.push(this.sampType);
   }
 
   // This function will be called when the user submits a number using the sample modal form
@@ -497,8 +499,8 @@ export default class BaseComp extends Vue {
     // samp is the name of the array of strings that is displayed once this function exicutes
     
     this.sampError = false;
+    this.test2.push(99);
 
-    this.test3.push("r")
     var tvar = Math.floor(Math.random() * this.dbSize);
     var tsamp = [""]
     var tempFaces = this.dbFaces;
