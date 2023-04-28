@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper" class="flex-container" @click="readCSV">
     <header role="banner" style="width: 100%">
-      <img alt="Chicago Face Database" src="./assets/header.png">
+      <img href="https://www.chicagofaces.org/" alt="Chicago Face Database" src="./assets/header.png">
       <div class="headerDiv">
         <h1>Sample Generator</h1>
         <!-- Explain the purpose of the site -->
