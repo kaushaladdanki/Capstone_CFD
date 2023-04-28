@@ -14,19 +14,19 @@
             <br />
             <div v-if="sType==='Stratified'">
               <label for="sample-size-picker">Sample Size: </label>
-              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="2" />
               <br />
-              <p>Range for sample size must be between 1 and {{ dbSize }}</p>
+              <p>Range for sample size must be between 2 and {{ dbSize }}</p>
               <br />
               <label for="selFeat">Select Feature type:</label>
-              <select id="selFeat" v-model="featureType">
+              <select id="selFeat" v-model="featureType" required>
                 <option disabled value="">Select Feature Type</option>
                 <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
               </select>
               <br />
               <br />
-              <button class="submit" :disabled="!validSampleSize" @click.prevent="genSampleS()">Submit</button>
-              <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSampleS()">Submit</button>
+              <p v-if="!validSampleSizeS" id="sample-size-error-message">Invalid sample size</p>
             </div>
             <div v-if="sType==='Random'">
               <label for="sample-size-picker">Sample Size: </label>
@@ -34,8 +34,8 @@
               <br />
               <p>Range for sample size must be between 1 and {{ dbSize }}</p>
               <br />
-              <button class="submit" :disabled="!validSampleSize" @click.prevent="genSampleR()">Submit</button>
-              <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+              <button class="submit" :disabled="!validSampleSizeR" @click.prevent="genSampleR()">Submit</button>
+              <p v-if="!validSampleSizeR" id="sample-size-error-message">Invalid sample size</p>
             </div>
             
             <!-- <button type="button" @click.prevent="tester()">{{ test }}</button> -->
@@ -69,8 +69,12 @@ export default class Sample extends Vue {
     this.test = Math.floor(Math.random() * 100)
   }
 
-  get validSampleSize() {
+  get validSampleSizeR() {
       return (this.sampleSize > 0 && this.sampleSize <= this.dSize);
+  }
+  
+  get validSampleSizeS() {
+      return (this.sampleSize > 1 && this.sampleSize <= this.dSize);
   }
   genSampleR(){
       this.$emit("genSampleR", this.sampleSize);
@@ -78,7 +82,7 @@ export default class Sample extends Vue {
   }  
 
   genSampleS(){
-      this.$emit("genSampleR", this.sampleSize);
+      this.$emit("genSampleS", this.sampleSize);
       this.closeThis();
   }  
 

@@ -32,7 +32,8 @@
           <button type="button" @click.prevent="selectFeat('White')">White</button>
           <br />
           <br />
-          <button type="button" @click.prevent="selectFeat('Other')">Other</button>
+          <!-- There are currently no faces categorized as Other
+          <button type="button" @click.prevent="selectFeat('Other')">Other</button> -->
         </div>
 
         <div v-if="featureType==='Gender'" >
