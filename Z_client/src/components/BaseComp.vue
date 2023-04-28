@@ -25,7 +25,7 @@
         <br />
         <br />
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
-        <!-- Display of generated sample  -->
+        <!-- Display of generated sample 
         <br />
         <br />
         Test2 = {{ test2 }}
@@ -35,7 +35,7 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br />
+        <br /> -->
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
       </section>
