@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper" class="flex-container" @click="readCSV">
     <header role="banner" style="width: 100%">
-      <img alt="Chicago Face Database" src="./assets/header.png">
+      <a href="https://www.chicagofaces.org/"><img  alt="Chicago Face Database" src="./assets/header.png"></a>
       <div class="headerDiv">
         <h1>Sample Generator</h1>
         <!-- Explain the purpose of the site -->
@@ -44,10 +44,10 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br /> 
+        <br /> -->
         <br />
         <br />
-        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>-->
+        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
         <br /> 
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
@@ -55,7 +55,7 @@
       <br />
       <aside role="complementary" aria-label="Filter">
         <h2>Face Feature Filter</h2>
-        <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
+        <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at <a href="https://www.chicagofaces.org/">chicagofaces.org</a></p>
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
@@ -232,6 +232,7 @@ export default class BaseComp extends Vue {
   feats = [""];
   faces = [[""]];
   dbFaces = [[""]];
+  dbFaces2 = [[""]];
   headerIndex: [number] = [0];
   usedFeats = [""];
   dbSize = 597;
@@ -298,7 +299,7 @@ export default class BaseComp extends Vue {
   
   toggleDisp() {
     this.displaySample = false;
-    location.reload();
+    //location.reload();
   }
 
   // This will add the filter to the list and remove the feature from the features list.
@@ -502,7 +503,11 @@ export default class BaseComp extends Vue {
 
     var tvar = Math.floor(Math.random() * this.dbSize);
     var tsamp = [""]
-    var tempFaces = this.dbFaces;
+    var tempFaces = [[""]];
+    for(var tbs in this.dbFaces){
+      tempFaces.push(this.dbFaces[tbs]);
+    }
+    tempFaces.shift();
     while (tsamp.length < s + 1){
       var test = tempFaces[tvar][0];
       if(!tsamp.includes(test)){
@@ -512,9 +517,9 @@ export default class BaseComp extends Vue {
       tvar = Math.floor(Math.random() * tempFaces.length);
     }
     tsamp.shift();
-    this.samp = tsamp;
 
     this.displaySample = true;
+    this.samp = tsamp;
     /*
 
     console.log("Generating Sample");
@@ -576,7 +581,10 @@ export default class BaseComp extends Vue {
 
     var ttvar = Math.floor(Math.random() * this.dbSize);
     var tcentroids = [{face:[""], cluster:-1}];
-    var ttempFaces = this.dbFaces;
+    var ttempFaces = [[""]];
+    for(var tbs in this.dbFaces2){
+      ttempFaces.push(this.dbFaces2[tbs]);
+    }
     var troid = 0;
     while (tcentroids.length < k + 1){
       var test = ttempFaces[ttvar];
