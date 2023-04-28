@@ -269,8 +269,8 @@ updateType(t: string){
       this.max = 100;
       break;
     case "Face Measurements":
-      this.min = 80;
-      this.max = 350;
+      this.min = 0;
+      this.max = 450;
       break;
   }
 }

@@ -26,7 +26,7 @@
         <br />
         <br />
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
-        <!-- Display of generated sample -->
+        <!-- Display of generated sample 
         <br />
         <br />
         <b v-if="sampError" style="text-align: center;">{{ sampEm }}</b>
@@ -42,7 +42,7 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br />
+        <br />-->
         <br />
         <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
         <br /> 

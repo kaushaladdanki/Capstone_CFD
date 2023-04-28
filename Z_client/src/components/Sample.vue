@@ -5,6 +5,7 @@
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <fieldset class="modal-header">
           <legend>Generate Sample</legend>
+            <br />
             <label for="sample-type">Sample Type</label>
             <select id="selSamp" v-model="sType">
                 <option disabled value="">Select Feature Type</option>
@@ -82,7 +83,7 @@ export default class Sample extends Vue {
   }  
 
   genSampleS(){
-      this.$emit("genSampleS", this.sampleSize);
+      this.$emit("genSampleR", this.sampleSize);
       this.closeThis();
   }  
 
@@ -107,54 +108,63 @@ export default class Sample extends Vue {
 @tan: #b8762a;
 @paleblue: #a1a9de;
 @brown: #a96149;
+header {
+width: 100vw;
+background-color: #222;
+padding: 15px;
+color: #fff;
+}
 .modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 98;
-  background-color: #32323277;
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+z-index: 98;
+background-color: #32323277;
+height: 75em;
+}
+fieldset {
+  border-width: 0px;
+  font-size: 20px;
+  margin-top: 16px;
 }
 .modal {
-  width: clamp(200px, 50%, 600px);
-  box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
-  border-radius: 25px; 
-  background-color: @tan;
-  margin: auto;
-  height: 50%;
-  margin-top: 20%;
-  position: relative;
-  overflow-y: auto;
+box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
+border-radius: 5px; 
+background-color: @tan;
+margin: auto;
+width: 300px;
+margin-top: 5%;
+position: relative;
+overflow-y: auto;
+color: #fff;
 }
 .modal-body {
-  color: #ffffff;
+color: #ffffff;
 }
 .modal-header {
-  color: #ffffff;
-  padding-top: 3px;
+color: #ffffff;
+padding-top: 3px;
 }
 .close-button {
-  position: absolute;
-  top: 15px; 
-  right: 15px;
+position: absolute;
+top: 15px; 
+right: 15px;
 }
 .filter {
-  width: 100%;
-  height: 50px;
-  margin: 20px 0px 12px 0px;
-  box-sizing: border-box;
-  position: relative;
+width: 100%;
+height: 50px;
+margin: 20px 0px 12px 0px;
+box-sizing: border-box;
+position: relative;
 }
 .filter-text {
-  padding: 15px 0px 0px 7px;
-  width: 80%;
-  text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-#sample-size-error-message {
-    color: red;
+padding: 15px 0px 0px 7px;
+width: 80%;
+text-align: left;
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
 }
 </style>
