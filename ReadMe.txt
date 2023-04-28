@@ -25,6 +25,8 @@ To Host on AWS Lightsail:
 - Once on the Lightsail Console, click 'Create Instance', and under 'Apps + OS' select Node.js
 - Click on the Instance, then under 'Networking', Create a Static-Ip with whatever name you want; this will be the ip you use to view the website once it is up: 'http://STATIC-IP:8080'
 - Also under Networking, under 'IPv4 Firewall', click 'Add Rule' and under Port or Range enter 8080, then click create (This ensures that aws will allow traffic on port 8080)
+
+REMAINING STEPS OCCUR INSIDE NODE INSTANCE TERMINAL:
 - Under 'Connect', click 'Connect using SSH', this will bring up a terminal screen
 - enter 'ls' to ensure htdocs is in the current directory, then enter 'cd htdocs'
 - inside 'htdocs' enter 'rm -rf *' to remove any files in the folder
