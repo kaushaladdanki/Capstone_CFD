@@ -3,17 +3,44 @@
     <div class="modal-overlay" id="sModal">     
       <div class="modal">
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
-        <div class="modal-header">
-          <h2>Generate Sample</h2>
-          <form>
-            <label for="sample-size-picker">Sample Size: </label>
-            <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
-            <button class="submit" :disabled="!validSampleSize" @click.prevent="genSample()">Submit</button>
-            <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+        <fieldset class="modal-header">
+          <legend>Generate Sample</legend>
+            <label for="sample-type">Sample Type</label>
+            <select id="selSamp" v-model="sType">
+                <option disabled value="">Select Feature Type</option>
+                <option v-for="s in stypes" :key="s" :value="s" @click.prevent="updateSize(dbSize)">{{ s }}</option>
+            </select>
+            <br />
+            <br />
+            <div v-if="sType==='Stratified'">
+              <label for="sample-size-picker">Sample Size: </label>
+              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+              <br />
+              <p>Range for sample size must be between 1 and {{ dbSize }}</p>
+              <br />
+              <label for="selFeat">Select Feature type:</label>
+              <select id="selFeat" v-model="featureType">
+                <option disabled value="">Select Feature Type</option>
+                <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
+              </select>
+              <br />
+              <br />
+              <button class="submit" :disabled="!validSampleSize" @click.prevent="genSampleS()">Submit</button>
+              <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+            </div>
+            <div v-if="sType==='Random'">
+              <label for="sample-size-picker">Sample Size: </label>
+              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+              <br />
+              <p>Range for sample size must be between 1 and {{ dbSize }}</p>
+              <br />
+              <button class="submit" :disabled="!validSampleSize" @click.prevent="genSampleR()">Submit</button>
+              <p v-if="!validSampleSize" id="sample-size-error-message">Invalid sample size</p>
+            </div>
+            
             <!-- <button type="button" @click.prevent="tester()">{{ test }}</button> -->
             
-          </form>
-        </div>
+        </fieldset>
       </div>
     </div>
 </template>
@@ -21,22 +48,48 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 
+@Options({
+props: {
+  dbSize: {
+    default: -1
+  }
+}
+})
+
 export default class Sample extends Vue {
   sampleSize = 5;
-  dbSize = 30;
-  test = 5
+  test = 5;
+  types = ["User Class Data","Attributes","Face Measurements"];
+  stypes = ["Stratified", "Random"]
+  featureType = ""
+  sType = ""
+  dSize = -1;
 
   tester(){
     this.test = Math.floor(Math.random() * 100)
   }
 
   get validSampleSize() {
-      return (this.sampleSize > 0 && this.sampleSize < this.dbSize-1);
+      return (this.sampleSize > 0 && this.sampleSize <= this.dSize);
   }
-  genSample(){
-      this.$emit("genSample", this.sampleSize);
+  genSampleR(){
+      this.$emit("genSampleR", this.sampleSize);
       this.closeThis();
   }  
+
+  genSampleS(){
+      this.$emit("genSampleR", this.sampleSize);
+      this.closeThis();
+  }  
+
+  updateSize(ds: number) {
+    this.dSize = ds;
+    this.sampleSize = ds;
+  }
+
+  updateType(t: string) {
+    this.$emit("setSampType", t)
+  }
   
   closeThis(){
         this.$emit("closeModalSample");

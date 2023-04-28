@@ -1,15 +1,15 @@
 <template>
-  <div id="wrapper" class="flex-container">
+  <div id="wrapper" class="flex-container" @click="readCSV">
     <header role="banner" style="width: 100%">
       <img alt="Chicago Face Database" src="./assets/header.png">
       <div class="headerDiv">
         <h1>Sample Generator</h1>
         <!-- Explain the purpose of the site -->
-        <p>The CFD Sample Generator will use machine learning to create a subset of faces from the CFD. 
+        <p>The Chicago Face Database Sample Generator will use machine learning to create a subset of faces from the CFD. 
           There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
           The faces in the generated sample will be displayed in text.</p>
-          <!-- load csv (in this case we are calling a function that parses the string representing the CSV) -->
-          <button class="submit" @click="readCSV" >Load Database</button>
+          <!-- load csv (in this case we are calling a function that parses the string representing the CSV) 
+          <button class="submit" @click="readCSV" >Load Database</button> -->
       </div>
     </header>
 
@@ -21,7 +21,8 @@
       <section role="region" aria-label="Sample">
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
-        <Sample v-if="showModalSample" @closeModalSample="toggleModalSample()" @genSample="genSamp" />
+        <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
+        @genSampleL="genSampL" @genSampleR="genSampR" @setSampType="setSampType" />
         <br />
         <br />
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
@@ -34,14 +35,17 @@
         Test output: {{ test }}
         <br />
         <br />
-        Test output array: {{ test2dA }}
-        <br /> -->
+        Test3: {{ test3 }}
+        <br />
+        <br />
+        Test output array: {{ test2dA }}-->
+        <br /> 
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
       </section>
       <br />
       <aside role="complementary" aria-label="Filter">
-        <h2>Filter</h2>
+        <h2>Face Feature Filter</h2>
         <p>Specify what faces will be present in the database by applying filters. Each face has over 50 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at chicagofaces.org</p>
         <br />
         <!-- Handle filter modal -->
@@ -212,13 +216,15 @@ export default class BaseComp extends Vue {
   }
   
   bigList = [this.bigFO];
+  loadCSV = false;
+  sampType = ""
   filterList = [""];
   feats = [""];
   faces = [[""]];
   dbFaces = [[""]];
   headerIndex: [number] = [0];
   usedFeats = [""];
-  dbSize = 0;
+  dbSize = 597;
   samp = [""];
   test = 0;
   test2 = [-3];
@@ -241,6 +247,11 @@ export default class BaseComp extends Vue {
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
+    if(this.loadCSV){
+      // pass
+    }
+    else {
+      this.loadCSV = true;
       var arrObj = [];
       //var lines = this.testCSV.split('\n');  //first 3 faces in the database
       var lines = this.cfdCSV.split('\n'); // uncomment this to use full database
@@ -258,6 +269,7 @@ export default class BaseComp extends Vue {
       this.dbFaces.shift();
       this.dbSize = this.faces.length;
       this.bigList.shift();
+    }
   }
 
   toggleModalFilter() {
@@ -430,22 +442,51 @@ export default class BaseComp extends Vue {
     }
     this.dbSize = this.dbFaces.length;
   }
+
+
+  setSampType(t: string){
+    this.sampType = t;
+    this.test3.shift();
+    this.test3.push(this.sampType);
+  }
+
   // This function will be called when the user submits a number using the sample modal form
   // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
-  genSamp(s: number){
+  genSampL(s: number){
+    // s is the sample size recieved from the sample modal form
+    // samp is the name of the array of strings that is displayed once this function exicutes
+    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    
+    switch (this.sampType){
+      case "Attribut":
+        clusters = this.attClusters(s);
+        break;
+      case "Face Measurements":
+        clusters = this.measClusters(s);
+        break;
+      case "UserClassData":
+        clusters = this.classClusters(s);
+        break;
+    }
+  }
+
+  // This function will be called when the user submits a number using the sample modal form
+  // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
+  genSampR(s: number){
     // s is the sample size recieved from the sample modal form
     // samp is the name of the array of strings that is displayed once this function exicutes
 
+
+    this.test3.push("r")
     this.test = s;
-    this.samp = ["the faces","of the sample"];
     var tvar = 0;
     var tsamp = [""]
     var tbs = ["AF-209","AF-234","AF-210","AF-239","AF-211","AF-293","AF-423","AF-514","AF-269","AF-272","AF-277","AF-201","AF-223","AF-299","AF-342","AF-419"]
-    while (tvar < s){
-      tsamp.push(tbs[tvar])
-      tvar = tvar + 1;
+    while (tsamp.length < s + 1){
+      tsamp.push(this.dbFaces[tvar][0]);
+      tvar = Math.floor(Math.random() * this.dbSize);
     }
-    tsamp.shift()
+    tsamp.shift();
     this.samp = tsamp;
 
     this.displaySample = !this.displaySample;
@@ -485,22 +526,15 @@ export default class BaseComp extends Vue {
 
   // returns a 2d array [[face, face], [face,face], ...] 
   // This array can be indexed as clusters[faceclusters][faces]
-  genClusters(s:number, tag:string){ 
+  genClusters(){ 
     var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
-    switch (tag){
-      case "t":
-        clusters = this.attClusters(s);
-        break;
-      case "m":
-        clusters = this.measClusters(s);
-        break;
-    }
+    
 
     // for testing purposes, clusters has 5 clusters of 1-5 faces
     return clusters
   }
 
-  attClusters(s:number) {
+  attClusters(k:number) {
     var attClust = [[""]];
     //dbFaces.slice(13,29)
 
@@ -508,7 +542,7 @@ export default class BaseComp extends Vue {
     var centInd1 = Math.floor(Math.random() * this.dbSize);
     var indexArr = [0];
     indexArr.shift();
-    while(indexArr.length < s){
+    while(indexArr.length < k){
       var r = Math.floor(Math.random() * this.dbSize);
       if(indexArr.indexOf(r) === -1) indexArr.push(r);
     }
@@ -538,6 +572,13 @@ export default class BaseComp extends Vue {
 
 
     return measClust;
+  }
+
+  classClusters(s:number) {
+    var classClust = [[""]];
+
+
+    return classClust;
   }
 
   testCSV = `Target,Race,Gender,Age,NumberofRaters,Female_prop,Male_prop,Asian_prop,Black_prop,Latino_prop,Multi_prop,Other_prop,White_prop,Afraid,Angry,Attractive,Babyface,Disgusted,Dominant,Feminine,Happy,Masculine,Prototypic,Sad,Suitability,Surprised,Threatening,Trustworthy,Unusual,Luminance_median,Nose_Width,Nose_Length,Lip_Thickness,Face_Length,R_Eye_H,L_Eye_H,Avg_Eye_Height,R_Eye_W,L_Eye_W,Avg_Eye_Width,Face_Width_Cheeks,Face_Width_Mouth,Forehead,Pupil_Top_R,Pupil_Top_L,Asymmetry_pupil_top,Pupil_Lip_R,Pupil_Lip_L,Asymmetry_pupil_lip,BottomLip_Chin,Midcheek_Chin_R,Midcheek_Chin_L,Cheeks_avg,Midbrow_Hairline_R,Midbrow_Hairline_L,Faceshape,Heartshapeness,Noseshape,LipFullness,EyeShape,EyeSize,UpperHeadLength,MidfaceLength,ChinLength,ForeheadHeight,CheekboneHeight,CheekboneProminence,FaceRoundness,fWHR
@@ -1207,6 +1248,11 @@ header {
 //for text logo
 header img {  max-height: 259px; max-width: 508px; height: auto; width: auto;}
 
+header p {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
 main {
   display: flex;
   justify-content: space-evenly;
@@ -1221,7 +1267,7 @@ aside {
   border-left-style: solid;
   border-left-width: 3px;
   border-left-color: #222249;
-  min-height: 600px;
+  min-height: 400px;
   margin-bottom: 40px;
 }
 

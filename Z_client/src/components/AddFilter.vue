@@ -67,7 +67,7 @@
         </div>
 
         <div v-if="featureType==='User Class Data'" >
-          <label for="pType">Select a Feature:</label>
+          <label for="pType">Select a Feature: </label>
           <select id="pType" v-model="featureString">
             <option disabled value="">Select Feature</option>
             <option v-for="i in feats.slice(5,13)" :key="i" :value="i" >{{ i }}</option>
