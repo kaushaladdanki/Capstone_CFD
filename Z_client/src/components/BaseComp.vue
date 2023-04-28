@@ -44,10 +44,10 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br /> -->
+        <br /> 
         <br />
         <br />
-        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
+        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>-->
         <br /> 
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
@@ -297,8 +297,8 @@ export default class BaseComp extends Vue {
   }
   
   toggleDisp() {
-    this.displaySample = !this.displaySample;
-    //location.reload();
+    this.displaySample = false;
+    location.reload();
   }
 
   // This will add the filter to the list and remove the feature from the features list.
@@ -499,7 +499,6 @@ export default class BaseComp extends Vue {
     // samp is the name of the array of strings that is displayed once this function exicutes
     
     this.sampError = false;
-    this.test2.push(99);
 
     var tvar = Math.floor(Math.random() * this.dbSize);
     var tsamp = [""]
@@ -515,7 +514,7 @@ export default class BaseComp extends Vue {
     tsamp.shift();
     this.samp = tsamp;
 
-    this.displaySample = !this.displaySample;
+    this.displaySample = true;
     /*
 
     console.log("Generating Sample");
