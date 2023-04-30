@@ -26,7 +26,7 @@
               </select>
               <br />
               <br />
-              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSampleS()">Submit</button>
+              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSample()">Submit</button>
               <p v-if="!validSampleSizeS" id="sample-size-error-message">Invalid sample size</p>
             </div>
             <div v-if="sType==='Random'">
