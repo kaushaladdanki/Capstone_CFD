@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper" class="flex-container" @click="readCSV">
+  <div id="wrapper" class="flex-container">
     <header role="banner" style="width: 100%">
       <a href="https://www.chicagofaces.org/"><img  alt="Chicago Face Database" src="./assets/header.png"></a>
       <div class="headerDiv">
@@ -8,8 +8,8 @@
         <p>The Chicago Face Database Sample Generator will use machine learning to create a subset of faces from the CFD. 
           There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
           The faces in the generated sample will be displayed in text.</p>
-          <!-- load csv (in this case we are calling a function that parses the string representing the CSV) 
-          <button class="submit" @click="readCSV" >Load Database</button> -->
+          <!-- load csv (in this case we are calling a function that parses the string representing the CSV)  -->
+          <button class="submit" @click="readCSV" >Load Database</button>
       </div>
     </header>
 
@@ -17,7 +17,6 @@
     <br />
 
     <main role="main">
-
       <section role="region" aria-label="Sample">
         <br />
         <br />
@@ -27,8 +26,9 @@
         @genSampleS="genSampS" @genSampleR="genSampR" @setSampType="setSampType" />
         <br />
         <br />
+        <!-- Come back and move this css to bottom -->
         <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
-        <!-- Display of generated sample
+        <!-- Display of generated sample -->
         <br />
         <br />
         <b v-if="sampError" style="text-align: center;">{{ sampEm }}</b>
@@ -44,10 +44,10 @@
         <br />
         <br />
         Test output array: {{ test2dA }}
-        <br /> -->
+        <br /> 
         <br />
         <br />
-        <button v-if="displaySample" @click="toggleDisp()">Clear Sample</button>
+        <button v-if="displaySample" @click="clearDisp()">Clear Sample</button>
         <br /> 
         <p v-if="displaySample">Face IDs in Sample:  {{ samp }}</p>
         <br />
@@ -59,7 +59,7 @@
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
-        :feats="feats" :faces="faces" v-model:filterObject="bigFO"/>
+        :feats="feats" :faces="faces" v-model:filterObject="baseFO"/>
         <button @click="toggleModalFilter()" >Add Filter</button>
         <br />
         <br />
@@ -120,7 +120,7 @@
         </div>
         <br />
         <!--
-        <div class="filter" v-for="f in bigList" :key="f.info">
+        <div class="filter" v-for="f in filters" :key="f.info">
           <p class="filter-text">
             {{f.info}}
             <button v-if="f.info != ''" class="close-button" type="button" @click.prevent="removeFilter(f)">X</button>
@@ -204,46 +204,30 @@ export default class BaseComp extends Vue {
   showModalSample = false;
   displaySample = false;
 
-  // Template for filter object recieved from the AddFilter component
+  // Template for filter object
   tempFO = {
-  feature: "defFeat",
+  feature: "defFeat", 
   category: 'defCat',
   max: -11,
   min: -11,
-  exclude: "defEx",
-  info: "",
-  cluster: -1
+  exclude: "defEx", //used for categorical data like race and gender filters to define category to exclude
+  info: ""
   }
 
-  bigFO = {
+  // filter object recieved from the AddFilter component
+  baseFO = {
   feature: "defFeat",
   category: 'defCat',
   max: -11,
   min: -11,
   exclude: "defEx",
-  info: "",
-  cluster: -1
+  info: ""
   }
   
-  bigList = [this.bigFO];
-  loadCSV = false;
-  sampType = ""
-  filterList = [""];
-  feats = [""];
-  faces = [[""]];
-  dbFaces = [[""]];
-  dbFaces2 = [[""]];
-  headerIndex: [number] = [0];
-  usedFeats = [""];
-  dbSize = 597;
-  samp = [""];
-  sampError = false;
-  sampEm = "";
-  test = 0;
-  test2 = [-3];
-  test3 = [""];
-  test2dA = [{face:[""], cluster:-1}];
-  // Variables handling filter lists display and contents
+  // The list of all filters
+  filters = [this.baseFO];
+
+  // Variables handling the filter lists display and contents
   hasGender = false;
   hasRace = false;
   hasAge = false;
@@ -257,32 +241,44 @@ export default class BaseComp extends Vue {
   attList = [this.tempFO];
   measList = [this.tempFO];
 
+  sampType = ""
+  filterList = [""];
+  feats = [""];
+  faces = [[""]];
+  dbFaces = [[""]];
+  dbFaces2 = [[""]];
+  headerIndex: [number] = [0];
+  usedFeats = [""];
+  dbSize = 0;
+  samp = [""];
+  sampError = false;
+  sampEm = "";
+  test = 0;
+  test2 = [-3];
+  test3 = [""];
+  test2dA = [{face:[""], cluster:-1}];
+ 
+
   // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
-    if(this.loadCSV){
-      // pass
-    }
-    else {
-      this.loadCSV = true;
-      var arrObj = [];
-      //var lines = this.testCSV.split('\n');  //first 3 faces in the database
-      var lines = this.cfdCSV.split('\n'); // uncomment this to use full database
-      var headers = lines[0].split(',');
-      var count = 1;
+    //var lines = this.testCSV.split('\n');  // load first 3 faces in the database
+    var lines = this.cfdCSV.split('\n'); // load full database
+    var headers = lines[0].split(',');
+    var count = 1;
 
-      for (var  i = 1; i < lines.length; i++){
-        var rowData = lines[i].split(',');
-        this.faces.push(rowData);
-        this.headerIndex.push(count);
-        count++;
-      }
-      this.feats = headers;
-      this.dbFaces = this.faces;
-      this.dbFaces.shift();
-      this.dbSize = this.faces.length;
-      this.bigList.shift();
+    for (var  i = 1; i < lines.length; i++){
+      var rowData = lines[i].split(',');
+      this.faces.push(rowData);
+      this.headerIndex.push(count);
+      count++;
     }
+    this.feats = headers;
+    this.dbFaces = this.faces;
+    this.dbFaces.shift();
+    this.dbSize = this.faces.length;
+    this.filters.shift();
+    
   }
 
   toggleModalFilter() {
@@ -297,18 +293,17 @@ export default class BaseComp extends Vue {
     this.showModalSample = !this.showModalSample;
   }
   
-  toggleDisp() {
+  clearDisp() {
     this.displaySample = false;
-    //location.reload();
   }
 
   // This will add the filter to the list and remove the feature from the features list.
   // apply filter to the database and dsiplay current # of faces present in database with filters applied.
   addNewFilter(){
     var temp = [""];
-    if(!this.usedFeats.includes(this.bigFO.feature)){
-      this.usedFeats.push(this.bigFO.feature);
-      this.bigList.push(this.bigFO);
+    if(!this.usedFeats.includes(this.baseFO.feature)){
+      this.usedFeats.push(this.baseFO.feature);
+      this.filters.push(this.baseFO);
     }
     else{
       //display message saying that user can only select one filter for each feature. remove old feature before adding new.
@@ -317,11 +312,11 @@ export default class BaseComp extends Vue {
   }
 
   // Remove filter from list
-  // add feature name back to features list for filter form
+  // also adds the feature name back to features list for filter form
   removeFilter(f:{feature:string, category:string, max:number, min:number, exclude:string, info:string}){
-    for(var i in this.bigList){
-      if(this.bigList[i].info===f.info){
-        this.bigList.splice(this.bigList.indexOf(this.bigList[i]),1);
+    for(var i in this.filters){
+      if(this.filters[i].info===f.info){
+        this.filters.splice(this.filters.indexOf(this.filters[i]),1);
         break;
       }
     }
@@ -334,14 +329,8 @@ export default class BaseComp extends Vue {
     this.updateFilter();
   }
 
-
-  // called after each add or remove filter
-  // This takes the entire database and applies each filter in the queue
-  // after each filter is applied, the total number of faces in database to be displayed is updated.
-  // the filtered faces array is also updated, that is the one passed to the sample generation function
-  updateFilter(){
-    this.dbFaces = this.faces;
-    // clear out the typed filter lists
+  // removes all filters and filter headings from the display
+  clearFilterDisplay() {
     this.hasGender = false;
     this.hasRace = false;
     this.hasAge = false;
@@ -360,100 +349,102 @@ export default class BaseComp extends Vue {
     this.attList.shift();
     this.classList = [this.tempFO];
     this.classList.shift();
+  }
 
-    // read through each filter in bigList
-    for(var i in this.bigList){
-      switch (this.bigList[i].category){
+  // called after each add or remove filter
+  // This takes the origional database and applies each filter in the queue
+  // After each filter is applied, the total number of faces in database to be displayed is updated.
+  // The filtered faces array is also updated, that is the one passed to the sample generation function
+  updateFilter(){
+    this.dbFaces = this.faces;
+    this.clearFilterDisplay();
+    
+    // read through each filter in the filters list
+    for(var i in this.filters){
+      switch (this.filters[i].category){
         // handles Gender filters
         case "g":
-          var tempFaces = [[""]];
-          var tempFeat = this.bigList[i].exclude;
-          for(var j in this.dbFaces){
-            if(this.dbFaces[j][this.feats.indexOf(this.bigList[i].feature)] !== this.bigList[i].exclude){
-              tempFaces.push(this.dbFaces[j]);
+          var gFaces = [[""]];
+          for(var g in this.dbFaces){
+            if(this.dbFaces[g][this.feats.indexOf(this.filters[i].feature)] !== this.filters[i].exclude){
+              gFaces.push(this.dbFaces[g]);
             }
           }
-          tempFaces.shift();
-          this.dbFaces = tempFaces;
-          this.genList.push(this.bigList[i]);
+          gFaces.shift();
+          this.dbFaces = gFaces;
+          this.genList.push(this.filters[i]);
           this.hasGender = true;
           break;
         // handles Race filters
         case "r":
-          var tempF2 = [[""]];
-          for(var k in this.dbFaces){
-            if(this.dbFaces[k][this.feats.indexOf("Race")] !== this.bigList[i].exclude){
-              tempF2.push(this.dbFaces[k]);
+          var rFaces = [[""]];
+          for(var r in this.dbFaces){
+            if(this.dbFaces[r][this.feats.indexOf("Race")] !== this.filters[i].exclude){
+              rFaces.push(this.dbFaces[r]);
             }
           }
-          tempF2.shift();
-          this.dbFaces = tempF2;
-          this.raceList.push(this.bigList[i]);
+          rFaces.shift();
+          this.dbFaces = rFaces;
+          this.raceList.push(this.filters[i]);
           this.hasRace = true;
           break;
-        // handles other, numerical filters
+        // handles Age filters
         case "a":
-          //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
-          var tempF3 = [[""]];
-          var tempFeat2 = this.bigList[i].feature;
-          for(var am in this.dbFaces){
-            if((Number(this.dbFaces[am][this.feats.indexOf(tempFeat2)]) > this.bigList[i].min) && 
-            (Number(this.dbFaces[am][this.feats.indexOf(tempFeat2)]) < this.bigList[i].max)) {
-              tempF3.push(this.dbFaces[am]);
+          var aFaces = [[""]];
+          var aFeat = this.filters[i].feature;
+          for(var a in this.dbFaces){
+            if((Number(this.dbFaces[a][this.feats.indexOf(aFeat)]) > this.filters[i].min) && 
+            (Number(this.dbFaces[a][this.feats.indexOf(aFeat)]) < this.filters[i].max)) {
+              aFaces.push(this.dbFaces[a]);
             }
-            //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
-          tempF3.shift();
-          this.dbFaces = tempF3;
-          this.ageList.push(this.bigList[i]);
+          aFaces.shift();
+          this.dbFaces = aFaces;
+          this.ageList.push(this.filters[i]);
           this.hasAge = true;
           break;
         case "m":
-          //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
-          var tempF3m = [[""]];
-          var tempFeat2m = this.bigList[i].feature;
+          var mFaces = [[""]];
+          var mFeat = this.filters[i].feature;
           for(var m in this.dbFaces){
-            if((Number(this.dbFaces[m][this.feats.indexOf(tempFeat2m)]) > this.bigList[i].min) && 
-            (Number(this.dbFaces[m][this.feats.indexOf(tempFeat2m)]) < this.bigList[i].max)) {
-              tempF3m.push(this.dbFaces[m]);
+            if((Number(this.dbFaces[m][this.feats.indexOf(mFeat)]) > this.filters[i].min) && 
+            (Number(this.dbFaces[m][this.feats.indexOf(mFeat)]) < this.filters[i].max)) {
+              mFaces.push(this.dbFaces[m]);
             }
-            //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
-          tempF3m.shift();
-          this.dbFaces = tempF3m;
-          this.measList.push(this.bigList[i]);
+          mFaces.shift();
+          this.dbFaces = mFaces;
+          this.measList.push(this.filters[i]);
           this.hasMeas = true;
           break;
+        // handles Attributes filters
         case "t":
-          //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
-          var tempF3t = [[""]];
-          var tempFeat2t = this.bigList[i].feature;
+          var tFaces = [[""]];
+          var tFeat = this.filters[i].feature;
           for(var tm in this.dbFaces){
-            if((Number(this.dbFaces[tm][this.feats.indexOf(tempFeat2t)]) > this.bigList[i].min) && 
-            (Number(this.dbFaces[tm][this.feats.indexOf(tempFeat2t)]) < this.bigList[i].max)) {
-              tempF3t.push(this.dbFaces[tm]);
+            if((Number(this.dbFaces[tm][this.feats.indexOf(tFeat)]) > this.filters[i].min) && 
+            (Number(this.dbFaces[tm][this.feats.indexOf(tFeat)]) < this.filters[i].max)) {
+              tFaces.push(this.dbFaces[tm]);
             }
             //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
-          tempF3t.shift();
-          this.dbFaces = tempF3t;
-          this.attList.push(this.bigList[i]);
+          tFaces.shift();
+          this.dbFaces = tFaces;
+          this.attList.push(this.filters[i]);
           this.hasAtt = true;
           break;
         case "c":
-          //note: prop values need to be multiplied by 100 to make them work, or go into add filter and divide user input by 100
-          var tempF3c = [[""]];
-          var tempFeat2c = this.bigList[i].feature;
+          var cFaces = [[""]];
+          var cFeat = this.filters[i].feature;
           for(var cm in this.dbFaces){
-            if((Number(this.dbFaces[cm][this.feats.indexOf(tempFeat2c)]) > this.bigList[i].min) && 
-            (Number(this.dbFaces[cm][this.feats.indexOf(tempFeat2c)]) < this.bigList[i].max)) {
-              tempF3c.push(this.dbFaces[cm]);
+            if((Number(this.dbFaces[cm][this.feats.indexOf(cFeat)]) > this.filters[i].min) && 
+            (Number(this.dbFaces[cm][this.feats.indexOf(cFeat)]) < this.filters[i].max)) {
+              cFaces.push(this.dbFaces[cm]);
             }
-            //else { this.testA.push(this.dbFaces[m][this.feats.indexOf(tempFeat2)]) }
           }
-          tempF3c.shift();
-          this.dbFaces = tempF3c;
-          this.classList.push(this.bigList[i]);
+          cFaces.shift();
+          this.dbFaces = cFaces;
+          this.classList.push(this.filters[i]);
           this.hasClass = true;
           break;
       }
@@ -467,29 +458,29 @@ export default class BaseComp extends Vue {
   }
 
   // This function will be called when the user submits a number using the sample modal form
-  // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
+  // genSamp pulls one random face from each cluster of faces
   genSampS(s: number){
     // s is the sample size recieved from the sample modal form
     // samp is the name of the array of strings that is displayed once this function exicutes
     var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
     this.test3.push(this.sampType);
+    this.sampError = false;
     switch (this.sampType){
       default:
         this.sampEm = "Stratified samples require a feature type to be specified to culster on."
         this.sampError = true;
         break;
       case "Attributes":
-        this.sampError = false;
         clusters = this.attClusters(s);
         break;
       case "Face Measurements":
-        this.sampError = false;
         //clusters = this.measClusters(s);
         break;
       case "User Class Data":
-        this.sampError = false;
         //clusters = this.classClusters(s);
         break;
+      case "All Features":
+        //clusters = this.genClusters(s);
     }
   }
 
@@ -520,6 +511,8 @@ export default class BaseComp extends Vue {
 
     this.displaySample = true;
     this.samp = tsamp;
+
+    
     /*
 
     console.log("Generating Sample");
@@ -557,11 +550,12 @@ export default class BaseComp extends Vue {
   // returns a 2d array [[face, face], [face,face], ...] 
   // This array can be indexed as clusters[faceclusters][faces]
   genClusters(){ 
-    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    // testClusters has 5 clusters of 1-5 faces
+    var testClusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
     
+    var retClusters = testClusters;
 
-    // for testing purposes, clusters has 5 clusters of 1-5 faces
-    return clusters
+    return retClusters
   }
 
 

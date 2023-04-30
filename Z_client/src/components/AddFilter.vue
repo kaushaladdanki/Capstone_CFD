@@ -182,8 +182,7 @@ filterObject = {
   max: -1,
   min: -1,
   exclude: "White",
-  info: "",
-  cluster: -1
+  info: ""
 }
 
 selectFeat(t: string){
