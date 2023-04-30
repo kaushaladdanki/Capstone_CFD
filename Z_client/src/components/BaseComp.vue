@@ -23,7 +23,7 @@
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
-        @genSampleS="genSampS" @genSampleR="genSampR" @setSampType="setSampType" />
+        @genSample="genSamp" @genSampleR="genSampR" @setSampType="setSampType" />
         <br />
         <br />
         <!-- Come back and move this css to bottom -->
@@ -488,8 +488,16 @@ export default class BaseComp extends Vue {
 
   }
 
+
+  // Stratified sampling code goes here 
+  // Should call initCentroids and genClusters
+  genSamp(k: number) {
+
+  }
+
   // returns a 2d array [[face, face], [face,face], ...] 
   // This array can be indexed as clusters[faceclusters][faces]
+  // may have to pass in initial centroids and array of points to measure to them.
   genClusters(){ 
     // testClusters has 5 clusters of 1-5 faces
     var testClusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
@@ -499,6 +507,7 @@ export default class BaseComp extends Vue {
     return retClusters
   }
 
+  // returns k number of faces randomly selected from the database to serve as initial centroids for k-means clustering
   initCentroids(k: number) {
     // select k random points to be initial centroids
     var centInd1 = Math.floor(Math.random() * this.dbSize);

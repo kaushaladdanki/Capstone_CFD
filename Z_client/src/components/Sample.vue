@@ -84,9 +84,14 @@ export default class Sample extends Vue {
   }  
 
   genSampleS(){
-      this.$emit("genSampleS", this.sampleSize);
+      this.$emit("genSampleR", this.sampleSize);
       this.closeThis();
-  }  
+  }
+  
+  genSample(){
+      this.$emit("genSamp", this.sampleSize);
+      this.closeThis();
+  }
 
   updateSize(ds: number) {
     this.dSize = ds;
