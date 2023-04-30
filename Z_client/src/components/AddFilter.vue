@@ -154,7 +154,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 
-// can probably just hard code in feature titles since props aren't loading on chrome
+// can probably just hard code in feature titles since props aren't loading on chrome (would need to handle adding FO when objects already exist in the list.)
 @Options({
 props: {
   feats: {
