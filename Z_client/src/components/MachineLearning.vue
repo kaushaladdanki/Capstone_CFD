@@ -21,6 +21,8 @@ export default class MachineLearning extends Vue {
 
 }
 
+
+
 </script>
 <style scoped lang="less">
 @purp: #222249;

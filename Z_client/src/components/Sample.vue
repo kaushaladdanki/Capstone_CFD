@@ -49,6 +49,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 
+// Props not loading properly on Chrome browser, can perhapse just move the code for this component into baseComp to avoid issue.
 @Options({
 props: {
   dbSize: {
@@ -83,7 +84,7 @@ export default class Sample extends Vue {
   }  
 
   genSampleS(){
-      this.$emit("genSampleR", this.sampleSize);
+      this.$emit("genSampleS", this.sampleSize);
       this.closeThis();
   }  
 

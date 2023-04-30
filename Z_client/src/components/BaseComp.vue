@@ -59,7 +59,7 @@
         <br />
         <!-- Handle filter modal -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
-        :feats="feats" :faces="faces" v-model:filterObject="baseFO"/>
+        :feats="feats" v-model:filterObject="baseFO"/>
         <button @click="toggleModalFilter()" >Add Filter</button>
         <br />
         <br />
@@ -457,35 +457,9 @@ export default class BaseComp extends Vue {
     this.sampType = t;
   }
 
-  // This function will be called when the user submits a number using the sample modal form
-  // genSamp pulls one random face from each cluster of faces
-  genSampS(s: number){
-    // s is the sample size recieved from the sample modal form
-    // samp is the name of the array of strings that is displayed once this function exicutes
-    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
-    this.test3.push(this.sampType);
-    this.sampError = false;
-    switch (this.sampType){
-      default:
-        this.sampEm = "Stratified samples require a feature type to be specified to culster on."
-        this.sampError = true;
-        break;
-      case "Attributes":
-        clusters = this.attClusters(s);
-        break;
-      case "Face Measurements":
-        //clusters = this.measClusters(s);
-        break;
-      case "User Class Data":
-        //clusters = this.classClusters(s);
-        break;
-      case "All Features":
-        //clusters = this.genClusters(s);
-    }
-  }
 
-  // This function will be called when the user submits a number using the sample modal form
-  // genSamp will run genClusters(s) and then pull one random face from each cluster of faces
+
+  // This function randomly selects a sample from the current database
   genSampR(s: number){
     // s is the sample size recieved from the sample modal form
     // samp is the name of the array of strings that is displayed once this function exicutes
@@ -512,39 +486,6 @@ export default class BaseComp extends Vue {
     this.displaySample = true;
     this.samp = tsamp;
 
-    
-    /*
-
-    console.log("Generating Sample");
-    let clusters = this.genClusters(0);
-    if (sampleSize <= 0 || clusters.length == 0) return [];
-    let minSize = clusters[0].length;
-    clusters.forEach(el => {
-        if (el.length < minSize) minSize = el.length;
-    });
-    let maxSampleSize: number = minSize * clusters.length;
-    if (sampleSize > maxSampleSize) {
-        return [];
-    }
-    let shuffled = clusters.sort(() => 0.5 - Math.random());
-
-    // Get first sampleSize % clusters.length elements
-    let baseCount = Math.floor(sampleSize / clusters.length);
-    let extraCount = sampleSize % clusters.length;
-    let base: Array<string> = []
-    shuffled.forEach((el, ind) => {
-        base = base.concat(el.sort(() => 0.5 - Math.random()).splice(0, baseCount + (ind < extraCount ? 1 : 0)));
-    });
-
-    this.samp = base;
-    this.displaySample = !this.displaySample;
-
-    return base;
-
-    */
-
-
-
   }
 
   // returns a 2d array [[face, face], [face,face], ...] 
@@ -558,12 +499,7 @@ export default class BaseComp extends Vue {
     return retClusters
   }
 
-
-  // perhapse set limit on samples sizes to samples of 20 or something if takes to long to measure
-  attClusters(k:number) {
-    var attClust = [[""]];
-    //dbFaces.slice(13,29)
-
+  initCentroids(k: number) {
     // select k random points to be initial centroids
     var centInd1 = Math.floor(Math.random() * this.dbSize);
     var indexArr = [0];
@@ -580,6 +516,8 @@ export default class BaseComp extends Vue {
       ttempFaces.push(this.dbFaces2[tbs]);
     }
     var troid = 0;
+
+
     while (tcentroids.length < k + 1){
       var test = ttempFaces[ttvar];
       var tempT = {face: test, cluster: troid}
@@ -592,106 +530,8 @@ export default class BaseComp extends Vue {
     }
     tcentroids.shift();
 
-    // measure all points to centroids and assign clusters
+    return tcentroids;
 
-    var tface1 = this.dbFaces[0];
-    var tface2 = this.dbFaces[1];
-    var tfaces = [{face:[""], cluster:-1}];
-    tfaces.shift();
-    var count = 0;
-
-    for(var tf in this.dbFaces){
-      tfaces.push({face:this.dbFaces[tf], cluster:-1});
-      var tMinDist = Number.MAX_VALUE;
-      for(var tc in tcentroids){
-        var tdTest = 0;
-        tface1 = tfaces[count].face;
-        tface2 = tcentroids[tc].face;
-        tdTest = this.getDistanceAtt(tface1, tface2);
-        if(tdTest < tMinDist){
-          tMinDist = tdTest;
-          tfaces[count].cluster = tcentroids[tc].cluster;
-        }
-      }
-      count = count + 1;
-    }
-
-    this.test2dA = tfaces;
-    this.test = tfaces.length;
-    
-    
-
-    
-    var dist = this.getDistanceAtt(tface1, tface2);
-
-    // remeasure new clusters and repeat until centroids stop changing position.
-
-    // return string of clusters
-    return attClust;
-  }
-
-  getDistanceAtt(face1: string[], face2: string[]){
-    var tsum = 0;
-    for (var i = 13; i <= 28; i++){
-      if(i===24){
-        //pass because suitability has null values in the database
-      }
-      else{
-        var t1 = Number(face1[i]);
-        var t2 = Number(face2[i]);
-        var tdiff = t1-t2;
-        tsum = tsum + (tdiff*tdiff);
-      }
-    }
-    return Math.sqrt(tsum);
-  }
-
-  measClusters(face1: string[], face2: string[]) {
-    var measClust = [[""]];
-    var tsum = 0;
-    for (var i = 13; i <= 28; i++){
-      if(i===24){
-        //pass because suitability has null values in the database
-      }
-      else{
-        var t1 = Number(face1[i]);
-        var t2 = Number(face2[i]);
-        var tdiff = t1-t2;
-        tsum = tsum + (tdiff*tdiff);
-        this.test2.push(i);
-        this.test2.push(t1);
-        this.test2.push(t2);
-        this.test2.push(tdiff);
-        this.test2.push(tsum);
-        this.test2.push(-100);
-      }
-    }
-
-    return measClust;
-  }
-
-  classClusters(face1: string[], face2: string[]) {
-    var classClust = [[""]];
-    var tsum = 0;
-    for (var i = 13; i <= 28; i++){
-      if(i===24){
-        //pass because suitability has null values in the database
-      }
-      else{
-        var t1 = Number(face1[i]);
-        var t2 = Number(face2[i]);
-        var tdiff = t1-t2;
-        tsum = tsum + (tdiff*tdiff);
-        this.test2.push(i);
-        this.test2.push(t1);
-        this.test2.push(t2);
-        this.test2.push(tdiff);
-        this.test2.push(tsum);
-        this.test2.push(-100);
-      }
-    }
-
-    return classClust;
   }
 
   testCSV = `Target,Race,Gender,Age,NumberofRaters,Female_prop,Male_prop,Asian_prop,Black_prop,Latino_prop,Multi_prop,Other_prop,White_prop,Afraid,Angry,Attractive,Babyface,Disgusted,Dominant,Feminine,Happy,Masculine,Prototypic,Sad,Suitability,Surprised,Threatening,Trustworthy,Unusual,Luminance_median,Nose_Width,Nose_Length,Lip_Thickness,Face_Length,R_Eye_H,L_Eye_H,Avg_Eye_Height,R_Eye_W,L_Eye_W,Avg_Eye_Width,Face_Width_Cheeks,Face_Width_Mouth,Forehead,Pupil_Top_R,Pupil_Top_L,Asymmetry_pupil_top,Pupil_Lip_R,Pupil_Lip_L,Asymmetry_pupil_lip,BottomLip_Chin,Midcheek_Chin_R,Midcheek_Chin_L,Cheeks_avg,Midbrow_Hairline_R,Midbrow_Hairline_L,Faceshape,Heartshapeness,Noseshape,LipFullness,EyeShape,EyeSize,UpperHeadLength,MidfaceLength,ChinLength,ForeheadHeight,CheekboneHeight,CheekboneProminence,FaceRoundness,fWHR

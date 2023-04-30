@@ -154,11 +154,9 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 
+// can probably just hard code in feature titles since props aren't loading on chrome
 @Options({
 props: {
-  faces: {
-    default: [[""]]
-  },
   feats: {
     default: [""]
   }
