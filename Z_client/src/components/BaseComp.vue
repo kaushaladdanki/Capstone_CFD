@@ -8,8 +8,9 @@
         <p>The Chicago Face Database Sample Generator will use machine learning to create a subset of faces from the CFD. 
           There is also an option to add filters to the CFD, allowing the user to specify the types of faces that will be present in the sample.
           The faces in the generated sample will be displayed in text.</p>
-          <!-- load csv (in this case we are calling a function that parses the string representing the CSV)  -->
-          <button class="submit" @click="readCSV" >Load Database</button>
+          <!-- load csv (in this case we are calling a function that parses the string representing the CSV) -->
+          <button class="submit" @click="readCSV" v-if="!loaded">Load Database</button>
+          
       </div>
     </header>
 
@@ -23,11 +24,57 @@
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
-        @genSample="genSamp" @genSampleR="genSampR" @setSampType="setSampType" />
+        @genSample="genSamp" @genSampleR="genSampleR" @setSampType="setSampType" />
+
+
+        <!--
+        <div class="modal" v-if="showModalSample" :dbSize="dbSize">
+          <fieldset class="modal-header">
+            <legend>Generate Sample</legend>
+            <br />
+            <label for="sample-type">Sample Type: </label>
+            <select id="selSamp" v-model="sType">
+                <option disabled value="">Select Feature Type</option>
+                <option v-for="s in stypes" :key="s" :value="s" @click.prevent="updateSize(dbSize)">{{ s }}</option>
+            </select>
+            <br />
+            <br />
+            <div v-if="sType==='Stratified'">
+              <label for="sample-size-picker">Sample Size: </label>
+              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="2" />
+              <br />
+              <p>Range for sample size must be between 2 and {{ dbSize }}</p>
+              <br />
+              <label for="selFeat">Select Feature type:</label>
+              <select id="selFeat" v-model="featureType" required>
+                <option disabled value="">Select Feature Type</option>
+                <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
+              </select>
+              <br />
+              <br />
+              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSample()">Submit</button>
+              <p v-if="!validSampleSizeS" id="sample-size-error-message">Invalid sample size</p>
+            </div>
+            <div v-if="sType==='Random'">
+              <label for="sample-size-picker">Sample Size: </label>
+              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
+              <br />
+              <p>Range for sample size must be between 1 and {{ dbSize }}</p>
+              <br />
+              <button class="submit" :disabled="!validSampleSizeR" @click.prevent="genSampleR()">Submit</button>
+              <p v-if="!validSampleSizeR" id="sample-size-error-message">Invalid sample size</p>
+            </div>
+            
+          </fieldset>
+        </div>
+
+         -->
+        
         <br />
         <br />
         <!-- Come back and move this css to bottom -->
-        <button @click="toggleModalSample()" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
+        <button @click="toggleModalSample" style="cursor: pointer; height: 50px; font-size: 20px; border-radius: 5px; border-color:#222249; background-color: #222249; color: #ffffff;">Generate Sample</button>
+        
         <!-- Display of generated sample -->
         <br />
         <br />
@@ -57,7 +104,7 @@
         <h2>Face Feature Filter</h2>
         <p>Specify what faces will be present in the database by applying filters. Each face has over 60 features to determine the types of faces the sample generater will draw from. Categorical features will have entire categories removed from the database. Empirical features will be constrained to reside insida a specified range. For more information on the face features, please download and read the supplemental for the Chicago Face Database at <a href="https://www.chicagofaces.org/">chicagofaces.org</a></p>
         <br />
-        <!-- Handle filter modal -->
+        <!-- Handle filter modal   -->
         <AddFilter v-if="showModalFilter" @closeModalFilter="toggleModalFilter()" @createNewFilter="addNewFilter" 
         :feats="feats" v-model:filterObject="baseFO"/>
         <button @click="toggleModalFilter()" >Add Filter</button>
@@ -257,11 +304,48 @@ export default class BaseComp extends Vue {
   test2 = [-3];
   test3 = [""];
   test2dA = [{face:[""], cluster:-1}];
- 
+  loaded = false;
 
-  // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
+
+  sampleSize = 5;
+  types = ["User Class Data","Attributes","Face Measurements"];
+  stypes = ["Stratified", "Random"]
+  featureType = ""
+  sType = ""
+  dSize = -1;
+
+  tester(){
+    this.test = Math.floor(Math.random() * 100)
+  }
+
+  validSampleSizeR() {
+      return (this.sampleSize > 0 && this.sampleSize <= this.dSize);
+  }
+  
+  validSampleSizeS() {
+      return (this.sampleSize > 1 && this.sampleSize <= this.dSize);
+  }
+  genSampleR(){
+    this.genSampR(this.sampleSize);
+  }  
+
+  genSampleS(){
+    this.genSampR(this.sampleSize);
+  }
+
+  updateSize(ds: number) {
+    this.dSize = ds;
+    this.sampleSize = ds;
+  }
+
+  updateType(t: string) {
+    this.$emit("setSampType", t)
+  }
+
+// this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
+    this.loaded = true;
     //var lines = this.testCSV.split('\n');  // load first 3 faces in the database
     var lines = this.cfdCSV.split('\n'); // load full database
     var headers = lines[0].split(',');
@@ -483,6 +567,8 @@ export default class BaseComp extends Vue {
     }
     tsamp.shift();
 
+    // display Sample
+
     this.displaySample = true;
     this.samp = tsamp;
 
@@ -492,6 +578,14 @@ export default class BaseComp extends Vue {
   // Stratified sampling code goes here 
   // Should call initCentroids and genClusters
   genSamp(k: number) {
+    var retSample = [""];
+
+    this.test = -1111;
+
+     // display Sample
+
+    //this.displaySample = true;
+    //this.samp = retSample;
 
   }
 
@@ -1262,6 +1356,30 @@ footer {
   padding-right: 20px;
   max-height: 259px;
   overflow: auto;
+}
+
+fieldset {
+  border-width: 0px;
+  font-size: 20px;
+  margin-top: 16px;
+}
+.modal {
+box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
+border-radius: 5px; 
+background-color: @tan;
+margin: auto;
+width: 300px;
+margin-top: 5%;
+position: relative;
+overflow-y: auto;
+color: #fff;
+}
+.modal-body {
+color: #ffffff;
+}
+.modal-header {
+color: #ffffff;
+padding-top: 3px;
 }
 
 </style>

@@ -9,7 +9,7 @@
         <label for="selFeat">Select Feature type:</label>
         <select id="selFeat" v-model="featureType">
           <option disabled value="">Select Feature Type</option>
-          <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
+          <option v-for="t in types" :key="t" :value="t" v-bind:featureType="t">{{ t }}</option>
         </select>
         <br />
         
@@ -255,6 +255,30 @@ selectFeat(t: string){
 }
 
 updateType(t: string){
+  if(t == "Age") {
+    this.min = 10;
+    this.max = 90;
+  }
+  else if (t == "Attributes"){
+    this.min = 0;
+    this.max = 6;
+  }
+  else if (t == "User Class Data"){
+    this.min = 0;
+    this.max = 100;
+  }
+  else if (t == "Face Measurements"){
+    this.min = 0;
+    this.max = 450;
+  }
+  else {
+    this.min = 99
+    this.max = 101
+  }
+  
+  this.min = 0
+  this.max = 454
+  /*
   switch (t) {
     default:
       break;
@@ -275,6 +299,8 @@ updateType(t: string){
       this.max = 450;
       break;
   }
+  
+      */
 }
 
 closeThis(){
@@ -342,6 +368,7 @@ checkValidity(){
     this.i2 = "You must select a feature to create a filter."
   }
   this.info = this.featureString + " is between " + this.featureMin + " and " + this.featureMax;
+  this.updateType(this.featureType);
 }
 
 }

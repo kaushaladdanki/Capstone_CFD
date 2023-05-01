@@ -1,7 +1,7 @@
 <template>
     <!-- Sample Modal -->
-    <div class="modal-overlay" id="sModal">     
-      <div class="modal">
+    <div class="modal-overlay" id="sModal" @click.prevent="updateForm(dbSize)">     
+      <div class="modal" >
         <button class="close-button" type="button" @click.prevent="closeThis">X</button>
         <fieldset class="modal-header">
           <legend>Generate Sample</legend>
@@ -9,7 +9,7 @@
             <label for="sample-type">Sample Type: </label>
             <select id="selSamp" v-model="sType">
                 <option disabled value="">Select Feature Type</option>
-                <option v-for="s in stypes" :key="s" :value="s" @click.prevent="updateSize(dbSize)">{{ s }}</option>
+                <option v-for="s in stypes" :key="s" :value="s" >{{ s }}</option>
             </select>
             <br />
             <br />
@@ -22,7 +22,7 @@
               <label for="selFeat">Select Feature type:</label>
               <select id="selFeat" v-model="featureType" required>
                 <option disabled value="">Select Feature Type</option>
-                <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
+                <option v-for="t in types" :key="t" :value="t" >{{ t }}</option>
               </select>
               <br />
               <br />
@@ -93,9 +93,13 @@ export default class Sample extends Vue {
       this.closeThis();
   }
 
+  updateForm(ds: number) {
+    this.updateSize(ds);
+    this.updateType(this.sType)
+  }
+
   updateSize(ds: number) {
     this.dSize = ds;
-    this.sampleSize = ds;
   }
 
   updateType(t: string) {
@@ -134,6 +138,8 @@ z-index: 98;
 background-color: #32323277;
 height: 75em;
 }
+
+
 fieldset {
   border-width: 0px;
   font-size: 20px;
@@ -157,6 +163,7 @@ color: #ffffff;
 color: #ffffff;
 padding-top: 3px;
 }
+
 .close-button {
 position: absolute;
 top: 15px; 
