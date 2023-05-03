@@ -2,8 +2,11 @@
 
 ## Project Submission Notes:
 
+The demo branch has the final version of the project that is being submitted. The other branches were not removed so grader can see brances and commits members worked on. All usefull code from these branches has been incorperated into the final submission.
+
 At the expo there was an issue with browser compatability. This issue has been resolved; however, now the project will not list the proper max an min for each feature type.
-This does not stop the application from being usable, but now the user will not be given accurate information on what the max and min range of the feature is. So a user could add a filter that does not affect the database or potentially remove all faces in the database. This information will be relayed to the user and it will be up to them to remove the filter that did it.
+This does not stop the application from being usable, but now the user will not be given accurate information on what the max and min range of the feature is. So a user could add a filter that does not affect the database or potentially remove all faces in the database. 
+This information will be relayed to the user and it will be up to them to remove the filter that did it.
 
 User class data values defined in the filter modal will be divided by 100 (as values are 0-1) so the user must provide a value between 0-100.
 
