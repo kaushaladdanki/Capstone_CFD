@@ -639,7 +639,7 @@ export default class BaseComp extends Vue {
     
 
     // continue to update centroids until the change is below threshold (0.01 in this case) or until 100 iterations
-    while((centDists > this.tolerance1) || counter > 100){
+    while((centDists > this.tolerance) || counter > 100){
       // reassign faces to new clusters
       count = 0;
       for(var wtf in this.dbFaces){
