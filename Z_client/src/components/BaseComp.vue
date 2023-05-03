@@ -183,22 +183,21 @@ export default class BaseComp extends Vue {
 
   loaded = false;  // tracks if readCFD has been run yet
   sampError = false;  // used to display error message when incomplete sample form is submitted
+  sampEm = ""; // error message string
 
   sampType = "" // stores type of stratified sample to be performed
+  samp = [""]; // sample to display
+
+  tolerance = 0.01; // determines minimum ammount of centroid change required before k-means stops running
+
+  // function variables
   filterList = [""];
   feats = [""];
   faces = [[""]];
   dbFaces = [[""]];
-  headerIndex: [number] = [0];
   usedFeats = [""];
   dbSize = 0;
-  samp = [""];
-  sampEm = "";
-
-
-  sampleSize = 5;
-  // feature types
-  types = ["User Class Data","Attributes","Face Measurements"];
+  sampleSize = 2;
   featureType = ""
   sType = ""
   dSize = -1;
@@ -208,15 +207,14 @@ export default class BaseComp extends Vue {
       _____________________________________________________________________________________________ 
   */
 
-  // This function will be called when the user submits a number using the sample modal form
-  // genSamp pulls one random face from each cluster of faces
+  // Sample generation for Stratified Sampling
   genSampS(s: number){
     // s is the sample size recieved from the sample modal form
-    // samp is the name of the array of strings that is displayed once this function exicutes
-    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    var clusters = [["AF-209","AF-234"],["AF-211","AF-293"],["AF-423"]] //example of what a cluster array will look like
     this.sampError = false;
     var sampRet = [""];
     sampRet.shift();
+    // call the appropriate functions depending on what features will be measured for k-means clustering
     switch (this.sampType){
       default:
         this.sampEm = "Stratified samples require a feature type to be specified to culster on.";
@@ -678,7 +676,6 @@ export default class BaseComp extends Vue {
     for (var  i = 1; i < lines.length; i++){
       var rowData = lines[i].split(',');
       this.faces.push(rowData);
-      this.headerIndex.push(count);
       count++;
     }
     this.feats = headers;
