@@ -26,7 +26,7 @@
               </select>
               <br />
               <br />
-              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSample()">Submit</button>
+              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSampleS()">Submit</button>
               <p v-if="!validSampleSizeS" id="sample-size-error-message">Invalid sample size</p>
             </div>
             <div v-if="sType==='Random'">
@@ -84,18 +84,18 @@ export default class Sample extends Vue {
   }  
 
   genSampleS(){
-      this.$emit("genSampleR", this.sampleSize);
+      this.$emit("genSampleS", this.sampleSize);
       this.closeThis();
   }
   
   genSample(){
-      this.$emit("genSamp", this.sampleSize);
+      this.$emit("genSample", this.sampleSize);
       this.closeThis();
   }
 
   updateForm(ds: number) {
     this.updateSize(ds);
-    this.updateType(this.sType)
+    this.updateType(this.featureType)
   }
 
   updateSize(ds: number) {

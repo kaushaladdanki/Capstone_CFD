@@ -24,7 +24,7 @@
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
-        @genSample="genSamp" @genSampleR="genSampleR" @setSampType="setSampType" />
+        @genSample="genSamp" @genSampleR="genSampleR" @genSampleS="genSampS" @setSampType="setSampType" />
 
 
         <!--
@@ -85,6 +85,9 @@
         <br />
         <br />
         Test output: {{ test }}
+        <br />
+        <br />
+        Test4: {{ test4 }}
         <br />
         <br />
         Test3: {{ test3 }}
@@ -270,6 +273,9 @@ export default class BaseComp extends Vue {
   exclude: "defEx",
   info: ""
   }
+
+  // face with zeroed out numerical features to be used to recalculate a new centroid
+  emptyFace = ["AF-000", "A", "F", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"];
   
   // The list of all filters
   filters = [this.baseFO];
@@ -303,6 +309,7 @@ export default class BaseComp extends Vue {
   test = 0;
   test2 = [-3];
   test3 = [""];
+  test4 = [[""]];
   test2dA = [{face:[""], cluster:-1}];
   loaded = false;
 
@@ -314,8 +321,270 @@ export default class BaseComp extends Vue {
   sType = ""
   dSize = -1;
 
-  tester(){
-    this.test = Math.floor(Math.random() * 100)
+  // This function will be called when the user submits a number using the sample modal form
+  // genSamp pulls one random face from each cluster of faces
+  genSampS(s: number){
+    // s is the sample size recieved from the sample modal form
+    // samp is the name of the array of strings that is displayed once this function exicutes
+    var clusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    this.test3.push(this.sampType);
+    this.sampError = false;
+    var sampRet = [""];
+    sampRet.shift();
+    switch (this.sampType){
+      default:
+        this.test3.push("def");
+        this.sampEm = "Stratified samples require a feature type to be specified to culster on.";
+        this.sampError = true;
+        break;
+      case "Attributes":
+        this.test3.push("at");
+        clusters = this.attClusters(s);
+        break;
+      case "Face Measurements":
+        this.test3.push("fm");
+        //clusters = this.measClusters(s);
+        break;
+      case "User Class Data":
+        this.test3.push("ucd");
+        //clusters = this.classClusters(s);
+        break;
+      case "All Features":
+        this.test3.push("all");
+        //clusters = this.genClusters(s);
+    }
+
+    //pull one random face from each cluster
+    var tsamp = [""];
+    tsamp.shift();
+    for (var cluster in clusters){
+      var cnum = clusters[cluster].length;
+      cnum = Math.floor(Math.random() * cnum);
+      tsamp.push(clusters[cluster][cnum]);
+    }
+
+    this.sampError = false;
+
+    // display Sample
+    this.displaySample = true;
+    this.samp = tsamp;
+  }
+
+
+
+  // perhapse set limit on samples sizes to samples of 20 or something if takes to long to measure
+  attClusters(k:number) {
+    var attClust = [[""]];
+    attClust.shift();
+
+    // generates a list of centroid objects {face: string, cluster: number} w/ clusters enumerated 0 to k-1
+    var centroids = this.initCentroids(k);
+
+    // measure all points to centroids and assign clusters
+    var tface1 = this.dbFaces[0];
+    var tface2 = this.dbFaces[1];
+    var tclusters = [{face:[""], cluster:-1}];
+    tclusters.shift();
+    var count = 0;
+
+    // initialize all faces in database as cluster objects (this is not generic and att specific)
+    for(var tf in this.dbFaces){
+      tclusters.push({face:this.dbFaces[tf], cluster:-1});
+      var tMinDist = Number.MAX_VALUE;
+      for(var tc in centroids){
+        var tdTest = 0;
+        tface1 = tclusters[count].face;
+        tface2 = centroids[tc].face;
+        tdTest = this.getDistanceAtt(tface1, tface2); // compare database face to centroid
+        if(tdTest < tMinDist){
+          tMinDist = tdTest;
+          tclusters[count].cluster = centroids[tc].cluster; // assign faces to cluster of closest centroid.
+        }
+      }
+      count = count + 1;
+    }
+
+    var newCentroids = this.updateCent(k, tclusters);
+
+    //compare the new centroids to the old and test to see if time to stop looping
+    var centDists = 0;
+    for(var ctroid in newCentroids) {
+      tface1 = centroids[ctroid].face;
+      tface2 = newCentroids[ctroid].face;
+      var troidDist = this.getDistanceAtt(tface1, tface2);
+      centDists = centDists + troidDist;
+    }
+    centDists = centDists/centroids.length;
+
+    this.test = centDists;
+    var counter = 0;
+    this.test2.push(counter);
+    this.test2.push(centDists);
+    
+
+    // continue to update centroids until the change is below threshold (0.01 in this case) or until 100 iterations
+    while((centDists > 0.01) || counter > 100){
+      // reassign faces to new clusters
+      count = 0;
+      for(var wtf in this.dbFaces){
+        var wtMinDist = Number.MAX_VALUE;
+        for(var wtc in newCentroids){
+          var wtdTest = 0;
+          tface1 = tclusters[count].face;
+          tface2 = newCentroids[wtc].face;
+          wtdTest = this.getDistanceAtt(tface1, tface2); // compare database face to centroid
+          if(wtdTest < wtMinDist){
+            wtMinDist = wtdTest;
+            tclusters[count].cluster = newCentroids[wtc].cluster; // assign faces to cluster of closest centroid.
+          }
+        }
+        count = count + 1;
+      }
+
+      //transfer faces of newCentroids into centroids array
+      for(var ele in newCentroids){
+        centroids.shift();
+        centroids.push(newCentroids[ele]);
+      }
+
+      //update new centroids
+      newCentroids = this.updateCent(k, tclusters);
+
+      //compare the new centroids to the old and test to see if time to stop looping
+      centDists = 0;
+      for(var wctroid in newCentroids) {
+        tface1 = centroids[wctroid].face;
+        tface2 = newCentroids[wctroid].face;
+        var wtroidDist = this.getDistanceAtt(tface1, tface2);
+        centDists = centDists + wtroidDist;
+      }
+      centDists = centDists/centroids.length;
+      
+    }
+
+    //construct return array[cluster][faceID]
+    for (var clust in newCentroids){
+      var retA = [""];
+      retA.shift();
+      for (var fac in tclusters){
+        if(newCentroids[clust].cluster == tclusters[fac].cluster){
+          retA.push(tclusters[fac].face[0]);
+        }
+        else{
+          //pass
+        }
+      }
+      attClust.push(retA);
+    }
+
+    return attClust;
+    
+  }
+
+  // this will be the part will stuff should be att specific prolly
+  updateCent(k: number, facesDB: {face:string[], cluster:number}[]){
+
+    // initialize new centorids
+    var retCent = [{face: ["def"], cluster: -1}];
+    retCent.shift();
+    var clusterCount = [0];
+    clusterCount.shift();
+    var x = 0;
+    while( x < k){    //this face object has all 0's for numerical features
+      retCent.push({face: ["AF-000", "A", "F", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+      , cluster: x});
+      clusterCount.push(0);
+      x++;
+    }
+    
+
+    // generate values for new cluster centroids based on current faces in each cluster
+    for(var f in facesDB){  
+      // count number of faces in each cluster
+      clusterCount[facesDB[f].cluster]++;
+      //this.test = clusterSums[retCent[f].cluster];
+      // sum features in each cluster
+      for(var feat in facesDB[f].face){  
+        //this.test2.push(Number(facesDB[f].cluster))
+        var tSum = Number(retCent[facesDB[f].cluster].face[feat]) + Number(facesDB[f].face[feat]);
+        retCent[facesDB[f].cluster].face[feat] = String(tSum);
+      } 
+    }
+
+    // divide cluster's feature sums by number of faces in database to get new centroid value
+    for(var tface in retCent){
+      var denom = clusterCount[retCent[tface].cluster];
+      for(var tfeat in retCent[tface].face){
+        var tNum = Number(retCent[tface].face[tfeat]);
+        tNum = tNum / denom;
+        retCent[tface].face[tfeat] = String(tNum);
+      }
+    } 
+    return retCent;
+  }
+
+  getDistanceAtt(face1: string[], face2: string[]){
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has NaN values in the database (specifically ".")
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+      }
+    }
+    return Math.sqrt(tsum);
+  }
+
+  measClusters(face1: string[], face2: string[]) {
+    var measClust = [[""]];
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has null values in the database
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+        this.test2.push(i);
+        this.test2.push(t1);
+        this.test2.push(t2);
+        this.test2.push(tdiff);
+        this.test2.push(tsum);
+        this.test2.push(-100);
+      }
+    }
+
+    return measClust;
+  }
+
+  classClusters(face1: string[], face2: string[]) {
+    var classClust = [[""]];
+    var tsum = 0;
+    for (var i = 13; i <= 28; i++){
+      if(i===24){
+        //pass because suitability has null values in the database
+      }
+      else{
+        var t1 = Number(face1[i]);
+        var t2 = Number(face2[i]);
+        var tdiff = t1-t2;
+        tsum = tsum + (tdiff*tdiff);
+        this.test2.push(i);
+        this.test2.push(t1);
+        this.test2.push(t2);
+        this.test2.push(tdiff);
+        this.test2.push(tsum);
+        this.test2.push(-100);
+      }
+    }
+
+    return classClust;
   }
 
   validSampleSizeR() {
@@ -339,10 +608,10 @@ export default class BaseComp extends Vue {
   }
 
   updateType(t: string) {
-    this.$emit("setSampType", t)
+    this.sampType = t;
   }
 
-// this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
+  // this function looks at the big csv string and turns it into a 2d array[faceindex][featureindex]
   // array of faces is stored in faces and the list of feature names are stored in feats
   readCSV(){
     this.loaded = true;
@@ -366,6 +635,9 @@ export default class BaseComp extends Vue {
   }
 
   toggleModalFilter() {
+    if(!this.loaded){
+      this.readCSV();
+    }
     this.showModalFilter = !this.showModalFilter
   }
 
@@ -375,6 +647,9 @@ export default class BaseComp extends Vue {
 
   toggleModalSample() {
     this.showModalSample = !this.showModalSample;
+    if(!this.loaded){
+      this.readCSV();
+    }
   }
   
   clearDisp() {
@@ -604,19 +879,18 @@ export default class BaseComp extends Vue {
   // returns k number of faces randomly selected from the database to serve as initial centroids for k-means clustering
   initCentroids(k: number) {
     // select k random points to be initial centroids
-    var centInd1 = Math.floor(Math.random() * this.dbSize);
     var indexArr = [0];
     indexArr.shift();
     while(indexArr.length < k){
       var r = Math.floor(Math.random() * this.dbSize);
-      if(indexArr.indexOf(r) === -1) indexArr.push(r);
+      if(indexArr.indexOf(r) === -1) {indexArr.push(r);}
     }
 
     var ttvar = Math.floor(Math.random() * this.dbSize);
     var tcentroids = [{face:[""], cluster:-1}];
     var ttempFaces = [[""]];
-    for(var tbs in this.dbFaces2){
-      ttempFaces.push(this.dbFaces2[tbs]);
+    for(var tbs in this.dbFaces){
+      ttempFaces.push(this.dbFaces[tbs]);
     }
     var troid = 0;
 
