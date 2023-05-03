@@ -25,50 +25,6 @@
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
         @genSample="genSamp" @genSampleR="genSampleR" @genSampleS="genSampS" @setSampType="setSampType" />
-
-
-        <!--
-        <div class="modal" v-if="showModalSample" :dbSize="dbSize">
-          <fieldset class="modal-header">
-            <legend>Generate Sample</legend>
-            <br />
-            <label for="sample-type">Sample Type: </label>
-            <select id="selSamp" v-model="sType">
-                <option disabled value="">Select Feature Type</option>
-                <option v-for="s in stypes" :key="s" :value="s" @click.prevent="updateSize(dbSize)">{{ s }}</option>
-            </select>
-            <br />
-            <br />
-            <div v-if="sType==='Stratified'">
-              <label for="sample-size-picker">Sample Size: </label>
-              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="2" />
-              <br />
-              <p>Range for sample size must be between 2 and {{ dbSize }}</p>
-              <br />
-              <label for="selFeat">Select Feature type:</label>
-              <select id="selFeat" v-model="featureType" required>
-                <option disabled value="">Select Feature Type</option>
-                <option v-for="t in types" :key="t" :value="t" @click.prevent="updateType(t)">{{ t }}</option>
-              </select>
-              <br />
-              <br />
-              <button class="submit" :disabled="!validSampleSizeS" @click.prevent="genSample()">Submit</button>
-              <p v-if="!validSampleSizeS" id="sample-size-error-message">Invalid sample size</p>
-            </div>
-            <div v-if="sType==='Random'">
-              <label for="sample-size-picker">Sample Size: </label>
-              <input type="number" id="sample-size-picker" required v-model="sampleSize" min="1" />
-              <br />
-              <p>Range for sample size must be between 1 and {{ dbSize }}</p>
-              <br />
-              <button class="submit" :disabled="!validSampleSizeR" @click.prevent="genSampleR()">Submit</button>
-              <p v-if="!validSampleSizeR" id="sample-size-error-message">Invalid sample size</p>
-            </div>
-            
-          </fieldset>
-        </div>
-
-         -->
         
         <br />
         <br />
@@ -80,6 +36,7 @@
         <br />
         <b v-if="sampError" style="text-align: center;">{{ sampEm }}</b>
         <br />
+        <!--
         <br />
         Test2 = {{ test2 }}
         <br />
@@ -95,7 +52,7 @@
         <br />
         Test output array: {{ test2dA }}
         <br /> 
-        <br />
+        <br /> -->
         <br />
         <button v-if="displaySample" @click="clearDisp()">Clear Sample</button>
         <br /> 
@@ -343,11 +300,11 @@ export default class BaseComp extends Vue {
         break;
       case "Face Measurements":
         this.test3.push("fm");
-        //clusters = this.measClusters(s);
+        clusters = this.measClusters(s);
         break;
       case "User Class Data":
         this.test3.push("ucd");
-        //clusters = this.classClusters(s);
+        clusters = this.classClusters(s);
         break;
       case "All Features":
         this.test3.push("all");
@@ -362,8 +319,6 @@ export default class BaseComp extends Vue {
       cnum = Math.floor(Math.random() * cnum);
       tsamp.push(clusters[cluster][cnum]);
     }
-
-    this.sampError = false;
 
     // display Sample
     this.displaySample = true;
@@ -415,11 +370,7 @@ export default class BaseComp extends Vue {
       centDists = centDists + troidDist;
     }
     centDists = centDists/centroids.length;
-
-    this.test = centDists;
     var counter = 0;
-    this.test2.push(counter);
-    this.test2.push(centDists);
     
 
     // continue to update centroids until the change is below threshold (0.01 in this case) or until 100 iterations
@@ -459,7 +410,6 @@ export default class BaseComp extends Vue {
         centDists = centDists + wtroidDist;
       }
       centDists = centDists/centroids.length;
-      
     }
 
     //construct return array[cluster][faceID]
@@ -539,50 +489,231 @@ export default class BaseComp extends Vue {
     return Math.sqrt(tsum);
   }
 
-  measClusters(face1: string[], face2: string[]) {
-    var measClust = [[""]];
+  getDistanceMeas(face1: string[], face2: string[]){
     var tsum = 0;
-    for (var i = 13; i <= 28; i++){
-      if(i===24){
-        //pass because suitability has null values in the database
-      }
-      else{
-        var t1 = Number(face1[i]);
-        var t2 = Number(face2[i]);
-        var tdiff = t1-t2;
-        tsum = tsum + (tdiff*tdiff);
-        this.test2.push(i);
-        this.test2.push(t1);
-        this.test2.push(t2);
-        this.test2.push(tdiff);
-        this.test2.push(tsum);
-        this.test2.push(-100);
-      }
+    for (var i = 56; i <= 68; i++){
+      var t1 = Number(face1[i]);
+      var t2 = Number(face2[i]);
+      var tdiff = t1-t2;
+      tsum = tsum + (tdiff*tdiff);
     }
+    return Math.sqrt(tsum);
+  }
+
+  getDistanceClass(face1: string[], face2: string[]){
+    var tsum = 0;
+    for (var i = 5; i <= 13; i++){
+      var t1 = Number(face1[i]);
+      var t2 = Number(face2[i]);
+      var tdiff = t1-t2;
+      tsum = tsum + (tdiff*tdiff);
+    }
+    return Math.sqrt(tsum);
+  }
+
+  measClusters(k:number) {
+    var measClust = [[""]];
+    measClust.shift();
+
+    // generates a list of centroid objects {face: string, cluster: number} w/ clusters enumerated 0 to k-1
+    var centroids = this.initCentroids(k);
+
+    // measure all points to centroids and assign clusters
+    var tface1 = this.dbFaces[0];
+    var tface2 = this.dbFaces[1];
+    var tclusters = [{face:[""], cluster:-1}];
+    tclusters.shift();
+    var count = 0;
+
+    // initialize all faces in database as cluster objects (this is not generic and att specific)
+    for(var tf in this.dbFaces){
+      tclusters.push({face:this.dbFaces[tf], cluster:-1});
+      var tMinDist = Number.MAX_VALUE;
+      for(var tc in centroids){
+        var tdTest = 0;
+        tface1 = tclusters[count].face;
+        tface2 = centroids[tc].face;
+        tdTest = this.getDistanceMeas(tface1, tface2); // compare database face to centroid
+        if(tdTest < tMinDist){
+          tMinDist = tdTest;
+          tclusters[count].cluster = centroids[tc].cluster; // assign faces to cluster of closest centroid.
+        }
+      }
+      count = count + 1;
+    }
+
+    var newCentroids = this.updateCent(k, tclusters);
+
+    //compare the new centroids to the old and test to see if time to stop looping
+    var centDists = 0;
+    for(var ctroid in newCentroids) {
+      tface1 = centroids[ctroid].face;
+      tface2 = newCentroids[ctroid].face;
+      var troidDist = this.getDistanceMeas(tface1, tface2);
+      centDists = centDists + troidDist;
+    }
+    centDists = centDists/centroids.length;
+    var counter = 0;
+    
+
+    // continue to update centroids until the change is below threshold (0.01 in this case) or until 100 iterations
+    while((centDists > 0.01) || counter > 100){
+      // reassign faces to new clusters
+      count = 0;
+      for(var wtf in this.dbFaces){
+        var wtMinDist = Number.MAX_VALUE;
+        for(var wtc in newCentroids){
+          var wtdTest = 0;
+          tface1 = tclusters[count].face;
+          tface2 = newCentroids[wtc].face;
+          wtdTest = this.getDistanceMeas(tface1, tface2); // compare database face to centroid
+          if(wtdTest < wtMinDist){
+            wtMinDist = wtdTest;
+            tclusters[count].cluster = newCentroids[wtc].cluster; // assign faces to cluster of closest centroid.
+          }
+        }
+        count = count + 1;
+      }
+
+      //transfer faces of newCentroids into centroids array
+      for(var ele in newCentroids){
+        centroids.shift();
+        centroids.push(newCentroids[ele]);
+      }
+
+      //update new centroids
+      newCentroids = this.updateCent(k, tclusters);
+
+      //compare the new centroids to the old and test to see if time to stop looping
+      centDists = 0;
+      for(var wctroid in newCentroids) {
+        tface1 = centroids[wctroid].face;
+        tface2 = newCentroids[wctroid].face;
+        var wtroidDist = this.getDistanceMeas(tface1, tface2);
+        centDists = centDists + wtroidDist;
+      }
+      centDists = centDists/centroids.length;
+    }
+
+    //construct return array[cluster][faceID]
+    for (var clust in newCentroids){
+      var retA = [""];
+      retA.shift();
+      for (var fac in tclusters){
+        if(newCentroids[clust].cluster == tclusters[fac].cluster){
+          retA.push(tclusters[fac].face[0]);
+        }
+        else{
+          //pass
+        }
+      }
+      measClust.push(retA);
+    }
+    
 
     return measClust;
   }
 
-  classClusters(face1: string[], face2: string[]) {
+  classClusters(k:number) {
     var classClust = [[""]];
-    var tsum = 0;
-    for (var i = 13; i <= 28; i++){
-      if(i===24){
-        //pass because suitability has null values in the database
+    classClust.shift();
+
+    // generates a list of centroid objects {face: string, cluster: number} w/ clusters enumerated 0 to k-1
+    var centroids = this.initCentroids(k);
+
+    // measure all points to centroids and assign clusters
+    var tface1 = this.dbFaces[0];
+    var tface2 = this.dbFaces[1];
+    var tclusters = [{face:[""], cluster:-1}];
+    tclusters.shift();
+    var count = 0;
+
+    // initialize all faces in database as cluster objects (this is not generic and att specific)
+    for(var tf in this.dbFaces){
+      tclusters.push({face:this.dbFaces[tf], cluster:-1});
+      var tMinDist = Number.MAX_VALUE;
+      for(var tc in centroids){
+        var tdTest = 0;
+        tface1 = tclusters[count].face;
+        tface2 = centroids[tc].face;
+        tdTest = this.getDistanceClass(tface1, tface2); // compare database face to centroid
+        if(tdTest < tMinDist){
+          tMinDist = tdTest;
+          tclusters[count].cluster = centroids[tc].cluster; // assign faces to cluster of closest centroid.
+        }
       }
-      else{
-        var t1 = Number(face1[i]);
-        var t2 = Number(face2[i]);
-        var tdiff = t1-t2;
-        tsum = tsum + (tdiff*tdiff);
-        this.test2.push(i);
-        this.test2.push(t1);
-        this.test2.push(t2);
-        this.test2.push(tdiff);
-        this.test2.push(tsum);
-        this.test2.push(-100);
-      }
+      count = count + 1;
     }
+
+    var newCentroids = this.updateCent(k, tclusters);
+
+    //compare the new centroids to the old and test to see if time to stop looping
+    var centDists = 0;
+    for(var ctroid in newCentroids) {
+      tface1 = centroids[ctroid].face;
+      tface2 = newCentroids[ctroid].face;
+      var troidDist = this.getDistanceClass(tface1, tface2);
+      centDists = centDists + troidDist;
+    }
+    centDists = centDists/centroids.length;
+    var counter = 0;
+    
+
+    // continue to update centroids until the change is below threshold (0.01 in this case) or until 100 iterations
+    while((centDists > 0.01) || counter > 100){
+      // reassign faces to new clusters
+      count = 0;
+      for(var wtf in this.dbFaces){
+        var wtMinDist = Number.MAX_VALUE;
+        for(var wtc in newCentroids){
+          var wtdTest = 0;
+          tface1 = tclusters[count].face;
+          tface2 = newCentroids[wtc].face;
+          wtdTest = this.getDistanceClass(tface1, tface2); // compare database face to centroid
+          if(wtdTest < wtMinDist){
+            wtMinDist = wtdTest;
+            tclusters[count].cluster = newCentroids[wtc].cluster; // assign faces to cluster of closest centroid.
+          }
+        }
+        count = count + 1;
+      }
+
+      //transfer faces of newCentroids into centroids array
+      for(var ele in newCentroids){
+        centroids.shift();
+        centroids.push(newCentroids[ele]);
+      }
+
+      //update new centroids
+      newCentroids = this.updateCent(k, tclusters);
+
+      //compare the new centroids to the old and test to see if time to stop looping
+      centDists = 0;
+      for(var wctroid in newCentroids) {
+        tface1 = centroids[wctroid].face;
+        tface2 = newCentroids[wctroid].face;
+        var wtroidDist = this.getDistanceClass(tface1, tface2);
+        centDists = centDists + wtroidDist;
+      }
+      centDists = centDists/centroids.length;
+    }
+
+    //construct return array[cluster][faceID]
+    for (var clust in newCentroids){
+      var retA = [""];
+      retA.shift();
+      for (var fac in tclusters){
+        if(newCentroids[clust].cluster == tclusters[fac].cluster){
+          retA.push(tclusters[fac].face[0]);
+        }
+        else{
+          //pass
+        }
+      }
+      classClust.push(retA);
+    }
+    
+
 
     return classClust;
   }
