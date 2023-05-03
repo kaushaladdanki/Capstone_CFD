@@ -152,7 +152,10 @@ background-color: @tan;
 margin: auto;
 width: 300px;
 margin-top: 5%;
-position: relative;
+position: fixed;
+top: 40%;
+left: 50%;
+transform: translate(-50%, -50%);
 overflow-y: auto;
 color: #fff;
 }

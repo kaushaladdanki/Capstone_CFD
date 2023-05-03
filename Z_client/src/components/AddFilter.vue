@@ -408,15 +408,18 @@ fieldset {
   margin-top: 16px;
 }
 .modal {
-box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
-border-radius: 5px; 
-background-color: @tan;
-margin: auto;
-width: 300px;
-margin-top: 5%;
-position: relative;
-overflow-y: auto;
-color: #fff;
+  box-shadow: 1px 2px 4px rgba(153, 155, 168, 0.12);
+  border-radius: 5px; 
+  background-color: @tan;
+  margin: auto;
+  width: 300px;
+  margin-top: 5%;
+  position: fixed;
+  overflow-y: auto;
+  color: #fff;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .modal-body {
 color: #ffffff;
