@@ -2,7 +2,7 @@
 
 ## Project Submission Notes:
 
-The demo branch has the final version of the project that is being submitted. The other branches were not removed so grader can see brances and commits members worked on. All usefull code from these branches has been incorperated into the final submission.
+The main branch has the final version of the project that is being submitted. The other branches were not removed so grader can see brances and commits members worked on. All usefull code from these branches has been incorperated into the final submission.
 
 At the expo there was an issue with browser compatability. This issue has been resolved; however, now the project will not list the proper max an min for each feature type.
 This does not stop the application from being usable, but now the user will not be given accurate information on what the max and min range of the feature is. So a user could add a filter that does not affect the database or potentially remove all faces in the database. 
