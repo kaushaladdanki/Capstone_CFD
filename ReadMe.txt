@@ -14,7 +14,7 @@ The project should be able to accomodate adding new faces to the repository.
 
 The project will need to be updated to handle new features or feature categories.
 
-As faces are added to the database, the time it takes to generate run k-means will increase. To reduce the time, the tolerance can be increased, or the maximum number of times k-means loops can be reduced.
+As faces are added to the database, the time it takes to run k-means will increase. To reduce the time, the tolerance can be increased, or the maximum number of times k-means loops can be reduced.
 
 Stratified sampling compares feature measurments of a given feature type. 
 Example: feat type attributes will compare Attractiveness, Aggression, Dominance... etc
