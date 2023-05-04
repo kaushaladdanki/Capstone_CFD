@@ -16,7 +16,6 @@
 
     <br />
     <br />
-
     <main role="main">
       <section role="region" aria-label="Sample">
         <br />
@@ -24,8 +23,8 @@
         <b style="font-size: 1.6rem">Number of Faces in Current Database = {{ dbSize }}</b>
         <!-- Handle sample modal -->
         <Sample v-if="showModalSample" :dbSize="dbSize" @closeModalSample="toggleModalSample()" 
-        @genSample="genSamp" @genSampleR="genSampleR" @setSampType="setSampType" />
-
+        @genSample="genSample" @genSampleR="genSampleR" @setSampType="setSampType" />
+        
 
         <!--
         <div class="modal" v-if="showModalSample" :dbSize="dbSize">
@@ -231,12 +230,15 @@
   </div>
 </template>
 
+
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import AddFilter from './AddFilter.vue';
 import MachineLearning from './MachineLearning.vue';
 import Sample from './Sample.vue';
 import { TableHints } from 'sequelize';
+import kmeans from "kmeans-ts";
+import { Double } from 'mongodb';
 
 @Options({
   components: {
@@ -331,6 +333,10 @@ export default class BaseComp extends Vue {
 
   genSampleS(){
     this.genSampR(this.sampleSize);
+  }
+
+  genSample(){
+    this.genSamp(this.sampleSize);
   }
 
   updateSize(ds: number) {
@@ -568,40 +574,127 @@ export default class BaseComp extends Vue {
     tsamp.shift();
 
     // display Sample
-
+    this.test=9999
     this.displaySample = true;
     this.samp = tsamp;
 
   }
 
 
-  // Stratified sampling code goes here 
-  // Should call initCentroids and genClusters
+  // Our random sampling with Kmeans Clustering taking in a number k, gettting our clusters from genClusers, and then randomly sampling the clusters
   genSamp(k: number) {
-    var retSample = [""];
 
-    this.test = -1111;
-
+    this.sampError = false;
+    var retSample = [""];//Contains our final faces
      // display Sample
+    var clusters = this.genClusters(k);//Getting our clusters see genClusters
 
-    //this.displaySample = true;
-    //this.samp = retSample;
+    for (var i = 0; i < k; i++){
+      var cluster = clusters[i]
+      var randomElement = cluster[Math.floor(Math.random() * cluster.length)];
+      retSample.push(randomElement);
+    }
+    retSample.shift();
+
+    this.displaySample = true;
+    this.samp = retSample;//Right now this will pop up on the webpage however can output this data to a csv or other form
 
   }
+// A function to transform both our race and our gender data into categorical datatypes
+// Since Kmeans clustering only works on numeric values we have to pass in every categorical column and translate them to numeric values
+// This is a simple solution however a better solution could be scaling this instead of 0, 1, 2, 3
+  categoricalTransform(attribute: string[]){
+    var transformed = [""]
+    for(var attr in attribute){
+      switch(attribute[attr]){
+        case "M"://Male attribute in our csv
+          transformed.push("0");
+          break;
+        case "F"://Female attribute in our csv
+          transformed.push("1")
+          break;
+        case "A"://Asian attribute
+          transformed.push("0")
+          break;
+        case "B"://Black attribute
+          transformed.push("1")
+          break;
+        case "L"://Latino attribute
+          transformed.push("2")
+          break;
+        case "W"://White attribute
+          transformed.push("3")
+          break;
+      }
 
-  // returns a 2d array [[face, face], [face,face], ...] 
-  // This array can be indexed as clusters[faceclusters][faces]
-  // may have to pass in initial centroids and array of points to measure to them.
-  genClusters(){ 
+    }
+    transformed.shift();
+    return(transformed);
+  }
+
+  //Modified genClusters function
+  //This takes in k for kmeans clustering and then transforms our database into data that can be passed into kmeans algorithm
+  //Returns clusters in shape Array[[Face1, Face2, Face3, ...], [Face1, Face2, Face3, ...], [k]] cluster size will depend on algorithm
+  //Centroids are also logged but never returned
+  genClusters(k: number){ 
     // testClusters has 5 clusters of 1-5 faces
-    var testClusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
-    
-    var retClusters = testClusters;
+    // var testClusters = [["AF-209","AF-234","AF-210","AF-239"],["AF-211","AF-293"],["AF-423"],["AF-514","AF-269","AF-272","AF-277"],["AF-201","AF-223","AF-299","AF-342","AF-419"]]
+    var clusters = [];//Initializing our clusters be a list of empty lists, the number of lists contained is of size k
+    for (var k_clusters = 0; k_clusters < k; k_clusters++){
+      clusters[k_clusters] = [""];
+    }
+
+    //Transforming our categorical data into numeric however this will still give us string datatypes
+    var raceCol = this.dbFaces.map(function(value,index) { return value[1]; });
+    raceCol = this.categoricalTransform(raceCol);
+    var genderCol = this.dbFaces.map(function(value,index) { return value[2]; });
+    genderCol = this.categoricalTransform(genderCol);
+
+    this.dbFaces2 = this.dbFaces//Setting an additional dbfaces universal to our original dbfaces, just don't want to modify the original
+    //Going through and resetting the race and gender values to numeric
+    for (var i = 0; i < this.dbFaces.length; i++){
+      this.dbFaces2[i][1] = raceCol[i];
+      this.dbFaces2[i][2] = genderCol[i];
+    }
+
+    //Data contains strings while newdata will be a list of floats to pass into kmeans
+    var data = this.dbFaces2
+    var newData = [];
+    for (var face of data){//Looping through every face
+      var temp = []
+      for (var j = 1; j < face.length; j++){//Looping through all values in the DB minus the name of the face
+        var val =  parseFloat(face[j]);
+        temp.push(val);
+      }
+      newData.push(temp);
+    }
+    //console.log(newData)
+    var output = kmeans(newData, k, "kmeans");//Getting our kmeans from kmeans-ts, several options for this function call for example you can set iterations or use kmeans++
+    // var output = kmeans(newdata, k, "kmeans++") : example of calling kmeans++ with same npm library
+    // Link to kmeans-ts: https://www.npmjs.com/package/kmeans-ts
+    // var centroids = output.centroids; : Centroids value if needed. Can acces other values from output as needed
+
+    //Appending all of our faces from the original db from the clusters we generated. Output.indexes is a list of size this.dbfaces.length which contains the cluster number it belongs to
+    for (var cluster_idx =0; cluster_idx < output.indexes.length; cluster_idx++){
+      clusters[output.indexes[cluster_idx]].push(this.dbFaces2[cluster_idx][0]);
+    }
+    //Shifting all of our cluster lists to ommit empty string in first index
+    for(var shift_idx = 0; shift_idx < k; shift_idx++){
+      clusters[shift_idx].shift();
+    }
+
+    //console logs to check our outputs
+    // console.log(output);
+    // console.log(clusters);
+
+    var retClusters = clusters;//Setting our return
 
     return retClusters
   }
 
   // returns k number of faces randomly selected from the database to serve as initial centroids for k-means clustering
+  // Sample code from attempt at manual implementaton of kmeans
+  // Can be deleted if need be as it isn't used
   initCentroids(k: number) {
     // select k random points to be initial centroids
     var centInd1 = Math.floor(Math.random() * this.dbSize);
@@ -615,11 +708,10 @@ export default class BaseComp extends Vue {
     var ttvar = Math.floor(Math.random() * this.dbSize);
     var tcentroids = [{face:[""], cluster:-1}];
     var ttempFaces = [[""]];
-    for(var tbs in this.dbFaces2){
-      ttempFaces.push(this.dbFaces2[tbs]);
+    for(var tbs in this.dbFaces){
+      ttempFaces.push(this.dbFaces[tbs]);
     }
     var troid = 0;
-
 
     while (tcentroids.length < k + 1){
       var test = ttempFaces[ttvar];

@@ -1,0 +1,105 @@
+
+<html>
+    <head>
+        <title>KMeans with Pyscript</title>
+  
+        <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+        <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+        <!--An example of our py-env tage where we specify packages to install -->
+        <py-env>
+            - matplotlib
+            - numpy
+            - pandas
+            - scikit-learn
+        </py-env>
+    </head>
+    <body>
+        <h1> Plotting Clusters </h1>
+        <div id="scatterplot"> </div> 
+
+        <!--An example of using py-script tags. All of this python code is taken from the jupyter notebook
+        We do all of our imports and call functions as normal
+        Right now it is getting the full CSV from github however in future iterations it will get it from filter vue -->
+        <py-script>  
+            import matplotlib.pyplot as plt
+            import numpy as np
+            import pandas as pd
+            from sklearn.preprocessing import LabelEncoder# Need both of these for the transform from categorical to numeric
+            from sklearn.preprocessing import StandardScaler
+            from sklearn.cluster import KMeans
+            from sklearn.decomposition import PCA
+            from pyodide.http import open_url #Need this for getting csv url
+            from pandas.api.types import is_string_dtype# For checking if a pandas column is a string or not
+            from pandas.api.types import is_numeric_dtype
+
+            fig, ax = plt.subplots()
+     
+            
+            def categorical_transform(feature, name):
+                '''Function for transforming a categorical feature into a numeric one
+                Parameters: Feature - incoming categorical feature of strings, Name - name of the feature
+                Returns: one_hot - a one hot encoding of the feature
+                Notes: Can use scale and standard scalar to change from binary values'''
+                
+                encoder = LabelEncoder() # Now we get a categorical type and transform a certain column to numeric values
+                feature = encoder.fit_transform(feature.astype('str'))
+                one_hot = pd.get_dummies(feature, columns = name, prefix=name)#Once we have the numerics we do one hot encoding
+                #scale = StandardScaler()
+                
+                #new_vals = scale.fit_transform(one_hot)
+                #one_hot = pd.DataFrame(new_vals, columns = one_hot.columns)
+                return(one_hot)
+
+            
+            def compose_df(feature_list, df):
+                '''Function for getting the dataframe to perform clustering on
+                    Parameters: Feature_list - incoming list of features, df - master dataframe
+                    Returns: return_frame - a df containing are selected numeric values
+                    '''
+                return_frame = pd.DataFrame()
+                for feature in feature_list:
+                    if is_string_dtype(df[feature]):
+                        new_df = categorical_transform(df[feature], feature)
+                        return_frame = pd.concat([return_frame, new_df], axis=1)
+                    else:
+                        return_frame[feature] = df[feature]
+                
+                scale = StandardScaler()
+                
+                new_vals = scale.fit_transform(return_frame)
+                return_frame = pd.DataFrame(new_vals, columns = return_frame.columns)
+                
+                return(return_frame)
+
+
+            def clustering(df, k, feature_list):
+                df = compose_df(feature_list, df)
+                
+                pca = PCA().fit(df)
+                reduced_x = pca.transform(df)
+                
+                kmeans = KMeans(n_clusters = k)
+                km = kmeans.fit_predict(reduced_x)
+            
+                colors = ['red', 'blue', 'green', 'orange', 'purple', 'black', 'yellow', 'grey', 'brown', 'pink']
+                for i in range(len(np.unique(km))):
+                    plt.scatter(reduced_x[km==i, 0],reduced_x[km==i, 1],s=25,c=colors[i],label='Cluster1')
+                    
+                plt.scatter(kmeans.cluster_centers_[:,0],kmeans.cluster_centers_[:,1],s=100,c='magenta',label='Centroids')
+                return(km)
+
+
+            url = open_url("https://raw.githubusercontent.com/TheHansHofmann/Capstone_CFD/main/Z_client/cfd.csv")
+            faces_df = pd.read_csv(url)#Getting our CSV, Can also change this to only get the filtered DF
+            faces_df.columns = faces_df.columns.str.lower()
+            feat_list = ['race', 'gender', 'faceroundness', 'eyesize']#This is what would be changed if integrated with the site 
+            #We can simply acces the inner html of a tag from our selection page and then be able to obtain which features we need
+            clustering(faces_df, 10, feat_list)
+            
+            pyscript.write('scatterplot', fig)#This is an example of plotting however we can write data to wherever we need to including html tags
+                
+        </py-script>
+    </body>
+</html>
+
+

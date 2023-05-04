@@ -89,7 +89,7 @@ export default class Sample extends Vue {
   }
   
   genSample(){
-      this.$emit("genSamp", this.sampleSize);
+      this.$emit("genSample", this.sampleSize);
       this.closeThis();
   }
 
