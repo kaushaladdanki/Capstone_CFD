@@ -472,8 +472,8 @@ export default class BaseComp extends Vue {
       case "All Features":
         //clusters = this.genClusters(s);
     }
-
-    //pull one random face from each cluster
+    if(!this.sampError){
+      //pull one random face from each cluster
     var tsamp = [""];
     tsamp.shift();
     for (var cluster in clusters){
@@ -485,6 +485,7 @@ export default class BaseComp extends Vue {
     // display Sample
     this.displaySample = true;
     this.samp = tsamp;
+    }
   }
 
 
