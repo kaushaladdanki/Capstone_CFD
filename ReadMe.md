@@ -81,10 +81,10 @@ REMAINING STEPS OCCUR INSIDE NODE INSTANCE TERMINAL:
 ## Project scripts
 See Z_client/README for more scripts than those listed below:
 
-start: node server/index.js
-dev: nodemon server/index.js
+start: node server/server.js
+dev: nodemon server/server.js
 
-Added server folder w/ index.js file
+Added server folder w/ server.js file
 - to tun via the server folder: node server.js
 - runs on port 8080
 
